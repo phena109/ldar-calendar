@@ -1,21 +1,16 @@
 # LDAR Calendar
 
-Cross-platform **proactive shared calendar** concept (Android + Apple), multi-party (couple / family / friends), graduated access, not a tracking app.
+Sketch of one person, one calendar: invite, group defaults, subscription. Not a product decision.
 
-## Source of truth
+## Try it in the browser
 
-- **Canonical intent:** [`docs/SOURCE_OF_TRUTH.md`](docs/SOURCE_OF_TRUTH.md)
-- **Raw chat transcript:** [`sources/chats/TRANSCRIPT.md`](sources/chats/TRANSCRIPT.md)
-- **Screenshot originals:** `sources/chats/*.jpeg`
+**https://phena109.github.io/ldar-calendar/**
 
-Idea owner: Janice Human C. (Messenger capture, 2026-09-01).
+Single static page. No local files. Account switcher uses roles only (You / Partner / Parent / Relative / Friend). State is in the browser (`localStorage`); **Clear & reset** restores the seed.
 
-## POC (local)
+EN / 香港繁體中文.
 
-Open in a browser (double-click or):
+## Repo
 
-`file:///home/douglas/projects/ldar-calendar/poc/index.html`
-
-- No server required. State is in `localStorage`. **清除並重設 / Clear & reset** restores the same seed.
-- Switch accounts along the top to see invites, group defaults, open join, and subscriptions.
-- EN / 香港繁體中文 toggle.
+- Live sketch: [`docs/index.html`](docs/index.html)
+- Working notes (not deployed): [`notes/SOURCE_OF_TRUTH.md`](notes/SOURCE_OF_TRUTH.md)

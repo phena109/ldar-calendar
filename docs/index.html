@@ -170,37 +170,37 @@
 
 <script>
 const LANG_KEY = "ldar-poc-lang";
-const STATE_KEY = "ldar-poc-state";
+const STATE_KEY = "ldar-poc-state-v2";
 const DAYS = [0,1,2,3,4,5,6];
 const SLOTS = ["pm", "eve"];
 
 const PEOPLE = [
-  { id: "janice", en: "Janice", zh: "Janice", initial: "J", color: "#c45c4a",
+  { id: "self", en: "You", zh: "自己", initial: "自", color: "#c45c4a",
     skin: { bg:"#f6eee6", ink:"#3b241c", accent:"#c45c4a", accent2:"#7a4b3a" },
     subscribeCap: "busy" },
-  { id: "kai", en: "Kai", zh: "阿啟", initial: "K", color: "#2f5d8a",
+  { id: "partner", en: "Partner", zh: "伴侶", initial: "伴", color: "#2f5d8a",
     skin: { bg:"#e9eef3", ink:"#1b2430", accent:"#2f5d8a", accent2:"#3d6b63" },
     subscribeCap: "busy" },
-  { id: "mum", en: "Mum", zh: "媽媽", initial: "M", color: "#4a7c59",
+  { id: "parent", en: "Parent", zh: "家長", initial: "長", color: "#4a7c59",
     skin: { bg:"#eef3ea", ink:"#243024", accent:"#4a7c59", accent2:"#c45c4a" },
     subscribeCap: "busy" },
-  { id: "mei", en: "Aunt Mei", zh: "美姨", initial: "姨", color: "#7a5a8e",
+  { id: "relative", en: "Relative", zh: "親戚", initial: "親", color: "#7a5a8e",
     skin: { bg:"#f3eef6", ink:"#2c2433", accent:"#7a5a8e", accent2:"#4a7c59" },
     subscribeCap: "busy" },
-  { id: "sam", en: "Sam", zh: "Sam", initial: "S", color: "#a67c2d",
+  { id: "friend", en: "Friend", zh: "朋友", initial: "友", color: "#a67c2d",
     skin: { bg:"#f3f0e4", ink:"#2a2618", accent:"#a67c2d", accent2:"#2f5d8a" },
     subscribeCap: "none" }
 ];
 
 const GROUPS = [
-  { id: "partner", members: ["janice","kai"], defaultAccess: "details" },
-  { id: "direct", members: ["janice","kai","mum"], defaultAccess: "busy" },
-  { id: "extended", members: ["janice","mum","mei"], defaultAccess: "busy" }
+  { id: "partner", members: ["self","partner"], defaultAccess: "details" },
+  { id: "direct", members: ["self","partner","parent"], defaultAccess: "busy" },
+  { id: "extended", members: ["self","parent","relative"], defaultAccess: "busy" }
 ];
 
 const I18N = {
   en: {
-    tagline: "A local sketch of one person, one calendar — sharing by invite, group default, or subscription. Nothing here is a product decision.",
+    tagline: "A sketch of one person, one calendar — sharing by invite, group default, or subscription. Nothing here is a product decision.",
     lang: "繁體中文（香港）",
     newEvent: "New activity",
     reset: "Clear & reset",
@@ -230,7 +230,7 @@ const I18N = {
     save: "Save", cancel: "Close",
     myHint: "Dashed empty cells are free. Coloured cells are yours. Other people see this week through group defaults, invites, or a subscription you allow.",
     noInvites: "No pending invites.",
-    movie: "Movie with Kai",
+    movie: "Movie together",
     fest: "Family festival",
     hike: "Saturday hike",
     dinner: "Dinner",
@@ -239,7 +239,7 @@ const I18N = {
     locked: "Evening locked"
   },
   zh: {
-    tagline: "本地試用：一個人一個日曆。以邀請、群組預設權限或訂閱來分享。此處只是互動草圖，並非產品決定。",
+    tagline: "試用草圖：一個人一個日曆。以邀請、群組預設權限或訂閱來分享。此處並非產品決定。",
     lang: "English",
     newEvent: "新增活動",
     reset: "清除並重設",
@@ -269,7 +269,7 @@ const I18N = {
     save: "儲存", cancel: "關閉",
     myHint: "虛線空格即有空。有色格是你自己的活動。其他人透過群組預設、邀請，或你容許的訂閱來見到這一週。",
     noInvites: "現時沒有待回覆邀請。",
-    movie: "同阿啟睇戲",
+    movie: "一齊睇戲",
     fest: "屋企做節",
     hike: "行山",
     dinner: "晚飯",
@@ -281,18 +281,18 @@ const I18N = {
 
 function seed() {
   return {
-    viewer: "janice",
+    viewer: "self",
     events: [
-      { id: "e1", ownerId: "janice", day: 1, slot: "eve", titleKey: "movie", share: "partner", open: false, joined: ["kai"] },
-      { id: "e2", ownerId: "mum", day: 3, slot: "pm", titleKey: "doctor", share: "direct", open: false, joined: [] },
-      { id: "e3", ownerId: "janice", day: 5, slot: "eve", titleKey: "fest", share: "direct", open: false, joined: [] },
-      { id: "e4", ownerId: "janice", day: 4, slot: "pm", titleKey: "hike", share: "open", open: true, joined: [] },
-      { id: "e5", ownerId: "janice", day: 3, slot: "eve", titleKey: "dinner", share: "private", open: false, joined: [] },
-      { id: "e6", ownerId: "kai", day: 0, slot: "eve", titleKey: "locked", share: "private", open: false, joined: [] },
-      { id: "e7", ownerId: "mei", day: 2, slot: "eve", titleKey: "tea", share: "extended", open: false, joined: [] }
+      { id: "e1", ownerId: "self", day: 1, slot: "eve", titleKey: "movie", share: "partner", open: false, joined: ["partner"] },
+      { id: "e2", ownerId: "parent", day: 3, slot: "pm", titleKey: "doctor", share: "direct", open: false, joined: [] },
+      { id: "e3", ownerId: "self", day: 5, slot: "eve", titleKey: "fest", share: "direct", open: false, joined: [] },
+      { id: "e4", ownerId: "self", day: 4, slot: "pm", titleKey: "hike", share: "open", open: true, joined: [] },
+      { id: "e5", ownerId: "self", day: 3, slot: "eve", titleKey: "dinner", share: "private", open: false, joined: [] },
+      { id: "e6", ownerId: "partner", day: 0, slot: "eve", titleKey: "locked", share: "private", open: false, joined: [] },
+      { id: "e7", ownerId: "relative", day: 2, slot: "eve", titleKey: "tea", share: "extended", open: false, joined: [] }
     ],
     invites: [
-      { id: "i1", eventId: "e5", fromId: "janice", toId: "sam", status: "pending" }
+      { id: "i1", eventId: "e5", fromId: "self", toId: "friend", status: "pending" }
     ],
     subs: []
   };
