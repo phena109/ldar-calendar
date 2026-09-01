@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LDAR</title>
+  <style>
+    :root {
+      --bg: #f3eee6;
+      --ink: #241c16;
+      --muted: #6b5e53;
+      --card: rgba(255, 251, 246, 0.86);
+      --line: rgba(36, 28, 22, 0.1);
+      --accent: #c45c4a;
+      --accent-2: #2c6b5a;
+      --busy: #c45c4a;
+      --ok: #2c6b5a;
+      --shadow: 0 18px 50px rgba(60, 40, 24, 0.12);
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      font-family: "PingFang HK", "PingFang TC", "Noto Sans HK", "Noto Sans TC",
+        "Hiragino Sans CNS", "Microsoft JhengHei", ui-sans-serif, system-ui, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(1200px 600px at 10% -10%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 55%),
+        radial-gradient(900px 500px at 110% 0%, color-mix(in srgb, var(--accent-2) 16%, transparent), transparent 50%),
+        var(--bg);
+      transition: background .35s ease, color .35s ease;
+    }
+    button, select, input { font: inherit; }
+    button { cursor: pointer; }
+    .wrap { max-width: 1280px; margin: 0 auto; padding: 22px 20px 64px; }
+    header.app {
+      display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
+      margin-bottom: 18px;
+    }
+    .brand { display: flex; flex-direction: column; gap: 4px; }
+    .brand h1 {
+      margin: 0; font-size: 28px; letter-spacing: .12em; font-weight: 650;
+    }
+    .brand p { margin: 0; color: var(--muted); font-size: 13px; max-width: 46ch; line-height: 1.45; }
+    .tools { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      border: 1px solid var(--line); background: var(--card); color: var(--ink);
+      padding: 8px 12px; border-radius: 999px; backdrop-filter: blur(10px);
+    }
+    .btn:hover { border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); }
+    .btn.primary { background: var(--accent); color: #fffaf6; border-color: transparent; }
+    .btn.danger { background: transparent; }
+    .accounts {
+      display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px;
+    }
+    .pill {
+      display: flex; align-items: center; gap: 8px;
+      padding: 7px 12px 7px 7px; border-radius: 999px;
+      border: 1px solid var(--line); background: var(--card);
+    }
+    .pill.on { outline: 2px solid var(--accent); background: #fff; }
+    .av {
+      width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center;
+      color: white; font-size: 12px; font-weight: 650;
+    }
+    .grid {
+      display: grid; grid-template-columns: 1.15fr 1.05fr .86fr; gap: 14px;
+    }
+    @media (max-width: 1040px) { .grid { grid-template-columns: 1fr; } }
+    .card {
+      background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+      box-shadow: var(--shadow); padding: 16px; backdrop-filter: blur(16px);
+    }
+    .card h2 { margin: 0 0 12px; font-size: 15px; letter-spacing: .04em; }
+    .week {
+      display: grid; grid-template-columns: 64px repeat(7, 1fr); gap: 6px;
+    }
+    .dh, .slot, .lab {
+      min-height: 72px; border-radius: 12px; padding: 8px;
+    }
+    .dh { min-height: auto; text-align: center; font-size: 12px; color: var(--muted); padding: 4px; }
+    .lab { display: grid; place-items: center; color: var(--muted); font-size: 12px; background: rgba(255,255,255,.35); }
+    .slot {
+      background: rgba(255,255,255,.45); border: 1px dashed var(--line); font-size: 12px; line-height: 1.35;
+    }
+    .slot.busy { background: color-mix(in srgb, var(--busy) 16%, white); border-style: solid; }
+    .slot.detail { background: color-mix(in srgb, var(--accent-2) 14%, white); border-style: solid; }
+    .slot.open { background: color-mix(in srgb, #d4a017 18%, white); border-style: solid; }
+    .slot.free { color: var(--muted); }
+    .slot b { display: block; font-size: 11px; font-weight: 650; }
+    .mini-week { display: grid; gap: 10px; }
+    .person-row { border: 1px solid var(--line); border-radius: 14px; padding: 10px; background: rgba(255,255,255,.4); }
+    .person-row .meta { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 8px; font-size: 12px; }
+    .tiny {
+      display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;
+    }
+    .tiny .c {
+      height: 46px; border-radius: 8px; font-size: 10px; padding: 4px; background: rgba(255,255,255,.5);
+      border: 1px solid var(--line); overflow: hidden;
+    }
+    .list { display: flex; flex-direction: column; gap: 8px; }
+    .item {
+      border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px; background: rgba(255,255,255,.5);
+      font-size: 13px;
+    }
+    .item .row { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+    .muted { color: var(--muted); }
+    .tag {
+      font-size: 10px; letter-spacing: .04em; padding: 2px 7px; border-radius: 999px;
+      border: 1px solid var(--line); display: inline-block;
+    }
+    dialog {
+      border: 0; border-radius: 20px; padding: 0; width: min(420px, calc(100vw - 24px));
+      box-shadow: var(--shadow); background: #fffaf6; color: var(--ink);
+    }
+    dialog::backdrop { background: rgba(28, 18, 12, .35); }
+    .dlg { padding: 18px; display: flex; flex-direction: column; gap: 10px; }
+    label { font-size: 12px; color: var(--muted); display: flex; flex-direction: column; gap: 4px; }
+    input, select {
+      border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; background: white;
+    }
+    .hint { font-size: 12px; color: var(--muted); margin-top: 8px; line-height: 1.45; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="app">
+      <div class="brand">
+        <h1>LDAR</h1>
+        <p id="tagline"></p>
+      </div>
+      <div class="tools">
+        <button class="btn" id="langBtn" type="button"></button>
+        <button class="btn primary" id="newBtn" type="button"></button>
+        <button class="btn danger" id="resetBtn" type="button"></button>
+      </div>
+    </header>
+    <div class="accounts" id="accounts"></div>
+    <div class="grid">
+      <section class="card">
+        <h2 id="myWeekTitle"></h2>
+        <div class="week" id="myWeek"></div>
+        <p class="hint" id="myHint"></p>
+      </section>
+      <section class="card">
+        <h2 id="othersTitle"></h2>
+        <div class="mini-week" id="others"></div>
+      </section>
+      <section class="card">
+        <h2 id="sideTitle"></h2>
+        <div class="list" id="side"></div>
+      </section>
+    </div>
+  </div>
+
+  <dialog id="dlg">
+    <form class="dlg" id="eventForm">
+      <h2 id="dlgTitle"></h2>
+      <label><span id="lblTitle"></span><input name="title" required maxlength="40" /></label>
+      <label><span id="lblDay"></span><select name="day"></select></label>
+      <label><span id="lblSlot"></span><select name="slot"></select></label>
+      <label><span id="lblShare"></span><select name="share"></select></label>
+      <label><span id="lblInvite"></span><select name="invite"></select></label>
+      <div class="tools">
+        <button class="btn primary" type="submit" id="saveBtn"></button>
+        <button class="btn" type="button" id="cancelBtn"></button>
+      </div>
+    </form>
+  </dialog>
+
+<script>
+const LANG_KEY = "ldar-poc-lang";
+const STATE_KEY = "ldar-poc-state-v2";
+const DAYS = [0,1,2,3,4,5,6];
+const SLOTS = ["pm", "eve"];
+
+const PEOPLE = [
+  { id: "self", en: "You", zh: "自己", initial: "自", color: "#c45c4a",
+    skin: { bg:"#f6eee6", ink:"#3b241c", accent:"#c45c4a", accent2:"#7a4b3a" },
+    subscribeCap: "busy" },
+  { id: "partner", en: "Partner", zh: "伴侶", initial: "伴", color: "#2f5d8a",
+    skin: { bg:"#e9eef3", ink:"#1b2430", accent:"#2f5d8a", accent2:"#3d6b63" },
+    subscribeCap: "busy" },
+  { id: "parent", en: "Parent", zh: "家長", initial: "長", color: "#4a7c59",
+    skin: { bg:"#eef3ea", ink:"#243024", accent:"#4a7c59", accent2:"#c45c4a" },
+    subscribeCap: "busy" },
+  { id: "relative", en: "Relative", zh: "親戚", initial: "親", color: "#7a5a8e",
+    skin: { bg:"#f3eef6", ink:"#2c2433", accent:"#7a5a8e", accent2:"#4a7c59" },
+    subscribeCap: "busy" },
+  { id: "friend", en: "Friend", zh: "朋友", initial: "友", color: "#a67c2d",
+    skin: { bg:"#f3f0e4", ink:"#2a2618", accent:"#a67c2d", accent2:"#2f5d8a" },
+    subscribeCap: "none" }
+];
+
+const GROUPS = [
+  { id: "partner", members: ["self","partner"], defaultAccess: "details" },
+  { id: "direct", members: ["self","partner","parent"], defaultAccess: "busy" },
+  { id: "extended", members: ["self","parent","relative"], defaultAccess: "busy" }
+];
+
+const I18N = {
+  en: {
+    tagline: "A sketch of one person, one calendar — sharing by invite, group default, or subscription. Nothing here is a product decision.",
+    lang: "繁體中文（香港）",
+    newEvent: "New activity",
+    reset: "Clear & reset",
+    myWeek: "My week",
+    others: "What I can see",
+    side: "Invites, groups, subscriptions",
+    viewing: "Viewing as",
+    pm: "Afternoon", eve: "Evening",
+    days: ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"],
+    busy: "Busy", free: "Free", details: "Details", open: "Open to join",
+    hidden: "Not shown", join: "Join", accept: "Accept", decline: "Decline",
+    invite: "Invite", pending: "Pending", subscribed: "Subscribed",
+    subscribe: "Subscribe", unsubscribe: "Stop",
+    cap: "Others may subscribe up to",
+    none: "Off",
+    groups: "Groups",
+    partner: "Partner", direct: "Direct family", extended: "Extended family",
+    gHint: "Group default applies to the other person’s week. Dropping an activity into a group lets members see its details.",
+    sharePrivate: "Keep private",
+    sharePartner: "Share to Partner group",
+    shareDirect: "Share to Direct family",
+    shareExtended: "Share to Extended family",
+    shareOpen: "Open — anyone may join",
+    inviteNone: "No extra invite",
+    dlg: "Add activity",
+    title: "Title", day: "Day", slot: "Time", share: "Share",
+    save: "Save", cancel: "Close",
+    myHint: "Dashed empty cells are free. Coloured cells are yours. Other people see this week through group defaults, invites, or a subscription you allow.",
+    noInvites: "No pending invites.",
+    movie: "Movie together",
+    fest: "Family festival",
+    hike: "Saturday hike",
+    dinner: "Dinner",
+    doctor: "Doctor visit",
+    tea: "Tea with relatives",
+    locked: "Evening locked"
+  },
+  zh: {
+    tagline: "試用草圖：一個人一個日曆。以邀請、群組預設權限或訂閱來分享。此處並非產品決定。",
+    lang: "English",
+    newEvent: "新增活動",
+    reset: "清除並重設",
+    myWeek: "我的一週",
+    others: "我可見的情況",
+    side: "邀請、群組、訂閱",
+    viewing: "目前帳戶",
+    pm: "下午", eve: "晚上",
+    days: ["星期一","星期二","星期三","星期四","星期五","星期六","星期日"],
+    busy: "忙碌", free: "有空", details: "詳情", open: "公開可參加",
+    hidden: "不顯示", join: "加入", accept: "接受", decline: "拒絕",
+    invite: "邀請", pending: "待回覆", subscribed: "已訂閱",
+    subscribe: "訂閱", unsubscribe: "取消訂閱",
+    cap: "容許其他人訂閱至",
+    none: "不開放",
+    groups: "群組",
+    partner: "伴侶", direct: "直系家人", extended: "親戚",
+    gHint: "群組預設決定你見到對方一週的程度。將活動放到群組後，成員便可見到該活動詳情。",
+    sharePrivate: "保持私人",
+    sharePartner: "分享到伴侶群組",
+    shareDirect: "分享到直系家人群組",
+    shareExtended: "分享到親戚群組",
+    shareOpen: "公開——其他人可以加入",
+    inviteNone: "不另外邀請",
+    dlg: "新增活動",
+    title: "名稱", day: "日子", slot: "時段", share: "分享",
+    save: "儲存", cancel: "關閉",
+    myHint: "虛線空格即有空。有色格是你自己的活動。其他人透過群組預設、邀請，或你容許的訂閱來見到這一週。",
+    noInvites: "現時沒有待回覆邀請。",
+    movie: "一齊睇戲",
+    fest: "屋企做節",
+    hike: "行山",
+    dinner: "晚飯",
+    doctor: "睇醫生",
+    tea: "同親戚飲茶",
+    locked: "呢個晚上已定"
+  }
+};
+
+function seed() {
+  return {
+    viewer: "self",
+    events: [
+      { id: "e1", ownerId: "self", day: 1, slot: "eve", titleKey: "movie", share: "partner", open: false, joined: ["partner"] },
+      { id: "e2", ownerId: "parent", day: 3, slot: "pm", titleKey: "doctor", share: "direct", open: false, joined: [] },
+      { id: "e3", ownerId: "self", day: 5, slot: "eve", titleKey: "fest", share: "direct", open: false, joined: [] },
+      { id: "e4", ownerId: "self", day: 4, slot: "pm", titleKey: "hike", share: "open", open: true, joined: [] },
+      { id: "e5", ownerId: "self", day: 3, slot: "eve", titleKey: "dinner", share: "private", open: false, joined: [] },
+      { id: "e6", ownerId: "partner", day: 0, slot: "eve", titleKey: "locked", share: "private", open: false, joined: [] },
+      { id: "e7", ownerId: "relative", day: 2, slot: "eve", titleKey: "tea", share: "extended", open: false, joined: [] }
+    ],
+    invites: [
+      { id: "i1", eventId: "e5", fromId: "self", toId: "friend", status: "pending" }
+    ],
+    subs: []
+  };
+}
+
+let lang = localStorage.getItem(LANG_KEY) || "zh";
+let state = loadState();
+
+function t(k) { return I18N[lang][k]; }
+function person(id) { return PEOPLE.find(p => p.id === id); }
+function nameOf(id) { const p = person(id); return lang === "zh" ? p.zh : p.en; }
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STATE_KEY);
+    if (!raw) return seed();
+    const parsed = JSON.parse(raw);
+    if (!parsed.events || !parsed.viewer) return seed();
+    return parsed;
+  } catch { return seed(); }
+}
+function save() { localStorage.setItem(STATE_KEY, JSON.stringify(state)); }
+
+function stronger(a, b) {
+  const rank = { none: 0, busy: 1, open: 2, details: 3, full: 4 };
+  return (rank[a] || 0) >= (rank[b] || 0) ? a : b;
+}
+function inGroup(gid, pid) { return GROUPS.find(g => g.id === gid).members.includes(pid); }
+
+function calendarAccess(viewerId, ownerId) {
+  if (viewerId === ownerId) return "full";
+  let best = "none";
+  for (const g of GROUPS) {
+    if (g.members.includes(viewerId) && g.members.includes(ownerId)) best = stronger(best, g.defaultAccess);
+  }
+  const owner = person(ownerId);
+  const sub = state.subs.find(s => s.fromId === viewerId && s.toId === ownerId);
+  if (sub && owner.subscribeCap !== "none") best = stronger(best, owner.subscribeCap);
+  return best;
+}
+
+function eventAccess(viewerId, ev) {
+  if (ev.ownerId === viewerId) return "full";
+  const inv = state.invites.find(i => i.eventId === ev.id && i.toId === viewerId && i.status === "accepted");
+  if (inv) return "details";
+  if (ev.open && ev.joined.includes(viewerId)) return "details";
+  if (ev.open) return "open";
+  if (ev.share !== "private" && ev.share !== "open" && inGroup(ev.share, viewerId) && inGroup(ev.share, ev.ownerId)) return "details";
+  const cal = calendarAccess(viewerId, ev.ownerId);
+  if (ev.share === "private") return "none";
+  return cal === "details" ? "details" : cal === "busy" ? "busy" : "none";
+}
+
+function eventAt(ownerId, day, slot) {
+  return state.events.find(e => e.ownerId === ownerId && e.day === day && e.slot === slot);
+}
+
+function applySkin() {
+  const s = person(state.viewer).skin;
+  const r = document.documentElement.style;
+  r.setProperty("--bg", s.bg);
+  r.setProperty("--ink", s.ink);
+  r.setProperty("--accent", s.accent);
+  r.setProperty("--accent-2", s.accent2);
+}
+
+function renderAccounts() {
+  const el = document.getElementById("accounts");
+  el.innerHTML = PEOPLE.map(p => `
+    <button class="pill ${p.id === state.viewer ? "on" : ""}" data-id="${p.id}" type="button">
+      <span class="av" style="background:${p.color}">${p.initial}</span>
+      ${nameOf(p.id)}
+    </button>`).join("");
+  el.querySelectorAll("button").forEach(b => b.onclick = () => { state.viewer = b.dataset.id; save(); render(); });
+}
+
+function titleOf(ev) { return ev.titleKey ? t(ev.titleKey) : (ev.title || ""); }
+
+function cellHtml(ev, access) {
+  if (!ev || access === "none") return `<span class="muted">${t("free")}</span>`;
+  if (access === "busy") return `<b>${t("busy")}</b>`;
+  if (access === "open") return `<b>${t("open")}</b>${titleOf(ev)}`;
+  return `<b>${titleOf(ev)}</b>`;
+}
+
+function renderMyWeek() {
+  const host = document.getElementById("myWeek");
+  let html = `<div></div>` + DAYS.map(d => `<div class="dh">${t("days")[d]}</div>`).join("");
+  for (const slot of SLOTS) {
+    html += `<div class="lab">${t(slot)}</div>`;
+    for (const day of DAYS) {
+      const ev = eventAt(state.viewer, day, slot);
+      const cls = !ev ? "free" : ev.open ? "open" : "detail";
+      html += `<div class="slot ${cls}">${cellHtml(ev, ev ? "full" : "none")}</div>`;
+    }
+  }
+  host.innerHTML = html;
+}
+
+function renderOthers() {
+  const host = document.getElementById("others");
+  host.innerHTML = PEOPLE.filter(p => p.id !== state.viewer).map(p => {
+    const access = calendarAccess(state.viewer, p.id);
+    const cells = SLOTS.map(slot => DAYS.map(day => {
+      const ev = eventAt(p.id, day, slot);
+      const acc = ev ? eventAccess(state.viewer, ev) : "none";
+      const label = cellHtml(ev, acc);
+      const kind = !ev || acc === "none" ? "" : acc === "busy" ? "busy" : acc === "open" ? "open" : "detail";
+      return `<div class="c ${kind}">${acc === "none" ? "" : label}</div>`;
+    }).join("")).join("");
+    const canSub = p.subscribeCap !== "none";
+    const subbed = state.subs.some(s => s.fromId === state.viewer && s.toId === p.id);
+    const subBtn = canSub
+      ? `<button class="btn" data-sub="${p.id}" type="button">${subbed ? t("unsubscribe") : t("subscribe")}</button>`
+      : "";
+    return `<div class="person-row">
+      <div class="meta"><strong>${nameOf(p.id)}</strong><span class="muted">${t(access === "none" ? "hidden" : access)}${subBtn}</span></div>
+      <div class="tiny">${cells}</div>
+    </div>`;
+  }).join("");
+  host.querySelectorAll("[data-sub]").forEach(b => b.onclick = () => {
+    const id = b.dataset.sub;
+    const i = state.subs.findIndex(s => s.fromId === state.viewer && s.toId === id);
+    if (i >= 0) state.subs.splice(i, 1);
+    else state.subs.push({ fromId: state.viewer, toId: id });
+    save(); render();
+  });
+}
+
+function renderSide() {
+  const mine = GROUPS.filter(g => g.members.includes(state.viewer)).map(g =>
+    `<div class="item"><div class="row"><strong>${t(g.id)}</strong><span class="tag">${t(g.defaultAccess)}</span></div>
+     <div class="muted">${g.members.map(nameOf).join(" · ")}</div></div>`
+  ).join("");
+  const pending = state.invites.filter(i => i.toId === state.viewer && i.status === "pending");
+  const invHtml = pending.length ? pending.map(i => {
+    const ev = state.events.find(e => e.id === i.eventId);
+    return `<div class="item"><div class="row"><span>${nameOf(i.fromId)} → ${titleOf(ev)}</span>
+      <span><button class="btn primary" data-acc="${i.id}" type="button">${t("accept")}</button>
+      <button class="btn" data-dec="${i.id}" type="button">${t("decline")}</button></span></div></div>`;
+  }).join("") : `<div class="item muted">${t("noInvites")}</div>`;
+
+  const opens = state.events.filter(e => e.open && e.ownerId !== state.viewer && !e.joined.includes(state.viewer));
+  const openHtml = opens.map(e =>
+    `<div class="item"><div class="row"><span>${t("open")}: ${titleOf(e)}</span>
+      <button class="btn primary" data-join="${e.id}" type="button">${t("join")}</button></div></div>`
+  ).join("");
+
+  const me = person(state.viewer);
+  document.getElementById("side").innerHTML = `
+    <div class="item"><strong>${t("groups")}</strong><div class="hint">${t("gHint")}</div></div>
+    ${mine}
+    <div class="item"><strong>${t("invite")}</strong></div>
+    ${invHtml}
+    ${openHtml}
+    <div class="item muted">${t("cap")}: ${t(me.subscribeCap)}</div>
+  `;
+  document.querySelectorAll("[data-acc]").forEach(b => b.onclick = () => {
+    const inv = state.invites.find(i => i.id === b.dataset.acc);
+    inv.status = "accepted";
+    const ev = state.events.find(e => e.id === inv.eventId);
+    if (!ev.joined.includes(state.viewer)) ev.joined.push(state.viewer);
+    save(); render();
+  });
+  document.querySelectorAll("[data-dec]").forEach(b => b.onclick = () => {
+    state.invites.find(i => i.id === b.dataset.dec).status = "declined";
+    save(); render();
+  });
+  document.querySelectorAll("[data-join]").forEach(b => b.onclick = () => {
+    const ev = state.events.find(e => e.id === b.dataset.join);
+    ev.joined.push(state.viewer);
+    save(); render();
+  });
+}
+
+function fillDialog() {
+  const form = document.getElementById("eventForm");
+  form.day.innerHTML = DAYS.map(d => `<option value="${d}">${t("days")[d]}</option>`).join("");
+  form.slot.innerHTML = `<option value="pm">${t("pm")}</option><option value="eve">${t("eve")}</option>`;
+  form.share.innerHTML = ["private","partner","direct","extended","open"].map(k => {
+    const label = { private: t("sharePrivate"), partner: t("sharePartner"), direct: t("shareDirect"),
+      extended: t("shareExtended"), open: t("shareOpen") }[k];
+    return `<option value="${k}">${label}</option>`;
+  }).join("");
+  form.invite.innerHTML = `<option value="">${t("inviteNone")}</option>` +
+    PEOPLE.filter(p => p.id !== state.viewer).map(p => `<option value="${p.id}">${nameOf(p.id)}</option>`).join("");
+}
+
+function renderChrome() {
+  document.documentElement.lang = lang === "zh" ? "zh-HK" : "en";
+  document.getElementById("tagline").textContent = t("tagline");
+  document.getElementById("langBtn").textContent = t("lang");
+  document.getElementById("newBtn").textContent = t("newEvent");
+  document.getElementById("resetBtn").textContent = t("reset");
+  document.getElementById("myWeekTitle").textContent = `${t("myWeek")} · ${t("viewing")} ${nameOf(state.viewer)}`;
+  document.getElementById("othersTitle").textContent = t("others");
+  document.getElementById("sideTitle").textContent = t("side");
+  document.getElementById("myHint").textContent = t("myHint");
+  document.getElementById("dlgTitle").textContent = t("dlg");
+  document.getElementById("lblTitle").textContent = t("title");
+  document.getElementById("lblDay").textContent = t("day");
+  document.getElementById("lblSlot").textContent = t("slot");
+  document.getElementById("lblShare").textContent = t("sharePrivate").split(" ")[0] ? t("title") && "分享 / Share" : "";
+  document.getElementById("lblShare").textContent = lang === "zh" ? "分享" : "Share";
+  document.getElementById("lblInvite").textContent = t("invite");
+  document.getElementById("saveBtn").textContent = t("save");
+  document.getElementById("cancelBtn").textContent = t("cancel");
+  fillDialog();
+}
+
+function render() {
+  applySkin();
+  renderChrome();
+  renderAccounts();
+  renderMyWeek();
+  renderOthers();
+  renderSide();
+}
+
+document.getElementById("langBtn").onclick = () => {
+  lang = lang === "zh" ? "en" : "zh";
+  localStorage.setItem(LANG_KEY, lang);
+  render();
+};
+document.getElementById("resetBtn").onclick = () => {
+  state = seed();
+  save();
+  render();
+};
+document.getElementById("newBtn").onclick = () => document.getElementById("dlg").showModal();
+document.getElementById("cancelBtn").onclick = () => document.getElementById("dlg").close();
+document.getElementById("eventForm").onsubmit = (e) => {
+  e.preventDefault();
+  const f = e.target;
+  const id = "e" + Date.now();
+  const share = f.share.value;
+  state.events.push({
+    id, ownerId: state.viewer, day: Number(f.day.value), slot: f.slot.value,
+    titleKey: null, title: f.title.value, share, open: share === "open", joined: []
+  });
+  if (f.invite.value) {
+    state.invites.push({ id: "i"+Date.now(), eventId: id, fromId: state.viewer, toId: f.invite.value, status: "pending" });
+  }
+  f.reset();
+  document.getElementById("dlg").close();
+  save(); render();
+};
+
+render();
+</script>
+</body>
+</html>
