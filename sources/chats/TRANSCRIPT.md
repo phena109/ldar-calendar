@@ -186,7 +186,9 @@ advance 既可唔可以放相 / sticker?
 
 **Collaborator:** 收到，我又研究一下再答+update 你
 
-Collaborator note (not Janice): 「日子 instead of days」 = use **dates** rather than the demo’s abstract **days**. Point 6 left **unresolved**.
+**Janice (later, 8:41 am):** 仲有 public holiday
+
+Collaborator note (not Janice): 「日子 instead of days」 = use **dates** rather than the demo’s abstract **days**. Point 6 left **unresolved**. 「仲有 public holiday」 recorded as an extra ask; not specified beyond that.
 
 ---
 

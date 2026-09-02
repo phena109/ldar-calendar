@@ -206,7 +206,7 @@ These are **gaps**, not decisions:
 
 ## 13. Demo feedback — Janice (WhatsApp, 2026-09-03)
 
-**Source:** `sources/chats/demo-feedback-*.png` + `TRANSCRIPT.md` Block G. Idea-owner after trying `https://phena109.github.io/ldar-calendar/`. Layout: 「版面上就咁睇係ok既」.
+**Source:** `sources/chats/demo-feedback-*.png` + `TRANSCRIPT.md` Block G. Idea-owner after trying `https://phena109.github.io/ldar-calendar/`. Layout: 「版面上就咁睇係ok既」。 Later addendum: `demo-feedback-4-public-holiday.png`.
 
 **Stance:** Conservative. High-confidence visual items may change in the sketch. Fragile / unverifiable items: say so in the demo notes popup; do not fake them. Conflicting or unclear lines: backlog — do not invent a product conclusion.
 
@@ -221,14 +221,15 @@ These are **gaps**, not decisions:
 - Event already has weekday — option for location / remark?
 - 「我唔係好 get 個『邀請』」; wants an option because this is **kinda share calendar**; with grouping she can **直篤**; if she does not want to see it, WhatsApp-like **del from my side only**. Collaborator: **not sure either — re-analyse; do not jump**. Earlier SoT still has **要 meeting invite**. Treat as **unresolved**, not as three decided verbs.
 - Advanced: photo / sticker; public event might be a whole invitation; **keep it simple**, don’t make loading heavy.
-- Close: 「暫時咁多先」.
+- Close: 「暫時咁多先」。
+- Next morning: 「仲有 public holiday」 only. Not specified: which region, statutory vs school, display-only vs blocking time. **Do not invent a holiday product.**
 
 ### Sketch response (2026-09-03)
 
 | Treat as | Item |
 |----------|------|
 | Changed in demo | Real calendar dates on the week; add-activity confirmation + stacked same-slot events (so add is visible); optional location / remark; caption that account pills are not login; first-open **示範說明** popup |
-| Popup / not in this demo | Real login; week/month/year switch; Outlook recurrence; notifications (cannot verify on a static page); custom groups; photos/stickers/heavy invitation; 邀請 vs share-calendar vs delete-my-side |
-| Backlog, no conclusion | B6 邀請 / 直篤 / del-from-my-side vs earlier meeting-invite. Custom groups. App notification design (keep settings simple if ever built). |
+| Popup / not in this demo | Real login; week/month/year switch; Outlook recurrence; notifications (cannot verify on a static page); custom groups; photos/stickers/heavy invitation; public holidays; 邀請 vs share-calendar vs delete-my-side |
+| Backlog, no conclusion | B6 邀請 / 直篤 / del-from-my-side vs earlier meeting-invite. Custom groups. App notification design (keep settings simple if ever built). Public holidays (underspecified one-liner). |
 
 Do not fold collaborator packaging (app > browser > page + email) into Janice canon until she says it.
