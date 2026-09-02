@@ -51,8 +51,9 @@
     .btn.primary { background: var(--accent); color: #fffaf6; border-color: transparent; }
     .btn.danger { background: transparent; }
     .accounts {
-      display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px;
+      display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px;
     }
+    .accounts-note { font-size: 12px; color: var(--muted); margin: 0 0 16px; line-height: 1.4; }
     .pill {
       display: flex; align-items: center; gap: 8px;
       padding: 7px 12px 7px 7px; border-radius: 999px;
@@ -78,7 +79,7 @@
     .dh, .slot, .lab {
       min-height: 72px; border-radius: 12px; padding: 8px;
     }
-    .dh { min-height: auto; text-align: center; font-size: 12px; color: var(--muted); padding: 4px; }
+    .dh { min-height: auto; text-align: center; font-size: 11px; color: var(--muted); padding: 4px; line-height: 1.35; white-space: pre-line; }
     .lab { display: grid; place-items: center; color: var(--muted); font-size: 12px; background: rgba(255,255,255,.35); }
     .slot {
       background: rgba(255,255,255,.45); border: 1px dashed var(--line); font-size: 12px; line-height: 1.35;
@@ -88,6 +89,7 @@
     .slot.open { background: color-mix(in srgb, #d4a017 18%, white); border-style: solid; }
     .slot.free { color: var(--muted); }
     .slot b { display: block; font-size: 11px; font-weight: 650; }
+    .slot .sub { display: block; font-size: 10px; color: var(--muted); }
     .mini-week { display: grid; gap: 10px; }
     .person-row { border: 1px solid var(--line); border-radius: 14px; padding: 10px; background: rgba(255,255,255,.4); }
     .person-row .meta { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 8px; font-size: 12px; }
@@ -98,6 +100,7 @@
       height: 46px; border-radius: 8px; font-size: 10px; padding: 4px; background: rgba(255,255,255,.5);
       border: 1px solid var(--line); overflow: hidden;
     }
+    .tiny .c.head { height: auto; min-height: 0; background: transparent; border: 0; color: var(--muted); text-align: center; padding: 0 0 4px; }
     .list { display: flex; flex-direction: column; gap: 8px; }
     .item {
       border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px; background: rgba(255,255,255,.5);
@@ -113,6 +116,7 @@
       border: 0; border-radius: 20px; padding: 0; width: min(420px, calc(100vw - 24px));
       box-shadow: var(--shadow); background: #fffaf6; color: var(--ink);
     }
+    dialog.wide { width: min(520px, calc(100vw - 24px)); }
     dialog::backdrop { background: rgba(28, 18, 12, .35); }
     .dlg { padding: 18px; display: flex; flex-direction: column; gap: 10px; }
     label { font-size: 12px; color: var(--muted); display: flex; flex-direction: column; gap: 4px; }
@@ -120,6 +124,17 @@
       border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; background: white;
     }
     .hint { font-size: 12px; color: var(--muted); margin-top: 8px; line-height: 1.45; }
+    .limits { font-size: 13px; line-height: 1.5; }
+    .limits h3 { margin: 12px 0 4px; font-size: 13px; }
+    .limits ul { margin: 0; padding-left: 1.15em; }
+    .limits li { margin: 4px 0; }
+    #toast {
+      position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%);
+      background: var(--ink); color: #fffaf6; padding: 10px 16px; border-radius: 999px;
+      font-size: 13px; z-index: 40; opacity: 0; pointer-events: none; transition: opacity .25s;
+      max-width: calc(100vw - 32px);
+    }
+    #toast.show { opacity: 1; }
   </style>
 </head>
 <body>
@@ -130,12 +145,14 @@
         <p id="tagline"></p>
       </div>
       <div class="tools">
+        <button class="btn" id="limitsBtn" type="button"></button>
         <button class="btn" id="langBtn" type="button"></button>
         <button class="btn primary" id="newBtn" type="button"></button>
         <button class="btn danger" id="resetBtn" type="button"></button>
       </div>
     </header>
     <div class="accounts" id="accounts"></div>
+    <p class="accounts-note" id="accountsNote"></p>
     <div class="grid">
       <section class="card">
         <h2 id="myWeekTitle"></h2>
@@ -159,6 +176,8 @@
       <label><span id="lblTitle"></span><input name="title" required maxlength="40" /></label>
       <label><span id="lblDay"></span><select name="day"></select></label>
       <label><span id="lblSlot"></span><select name="slot"></select></label>
+      <label><span id="lblPlace"></span><input name="place" maxlength="40" /></label>
+      <label><span id="lblRemark"></span><input name="remark" maxlength="80" /></label>
       <label><span id="lblShare"></span><select name="share"></select></label>
       <label><span id="lblInvite"></span><select name="invite"></select></label>
       <div class="tools">
@@ -168,11 +187,36 @@
     </form>
   </dialog>
 
+  <dialog id="limitsDlg" class="wide">
+    <div class="dlg limits">
+      <h2 id="limitsTitle"></h2>
+      <p id="limitsIntro" class="muted"></p>
+      <h3 id="limitsInHead"></h3>
+      <ul id="limitsIn"></ul>
+      <h3 id="limitsOutHead"></h3>
+      <ul id="limitsOut"></ul>
+      <div class="tools">
+        <button class="btn primary" type="button" id="limitsClose"></button>
+      </div>
+    </div>
+  </dialog>
+
+  <div id="toast" role="status"></div>
+
 <script>
 const LANG_KEY = "ldar-poc-lang";
-const STATE_KEY = "ldar-poc-state-v2";
+const STATE_KEY = "ldar-poc-state-v3";
+const LIMITS_KEY = "ldar-poc-seen-limits-v3";
 const DAYS = [0,1,2,3,4,5,6];
 const SLOTS = ["pm", "eve"];
+
+const WEEK = (() => {
+  const now = new Date();
+  const dow = now.getDay();
+  const offset = dow === 0 ? -6 : 1 - dow;
+  const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset);
+  return DAYS.map(i => new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + i));
+})();
 
 const PEOPLE = [
   { id: "self", en: "You", zh: "自己", initial: "自", color: "#c45c4a",
@@ -204,12 +248,13 @@ const I18N = {
     lang: "繁體中文（香港）",
     newEvent: "New activity",
     reset: "Clear & reset",
+    limitsBtn: "Demo notes",
     myWeek: "My week",
     others: "What I can see",
     side: "Invites, groups, subscriptions",
     viewing: "Viewing as",
     pm: "Afternoon", eve: "Evening",
-    days: ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"],
+    weekdays: ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"],
     busy: "Busy", free: "Free", details: "Details", open: "Open to join",
     hidden: "Not shown", join: "Join", accept: "Accept", decline: "Decline",
     invite: "Invite", pending: "Pending", subscribed: "Subscribed",
@@ -226,9 +271,9 @@ const I18N = {
     shareOpen: "Open — anyone may join",
     inviteNone: "No extra invite",
     dlg: "Add activity",
-    title: "Title", day: "Day", slot: "Time", share: "Share",
+    title: "Title", day: "Date", slot: "Time", place: "Location (optional)", remark: "Remark (optional)",
     save: "Save", cancel: "Close",
-    myHint: "Dashed empty cells are free. Coloured cells are yours. Other people see this week through group defaults, invites, or a subscription you allow.",
+    myHint: "This week uses real calendar dates. Dashed empty cells are free. Coloured cells are yours. Other people see this week through group defaults, invites, or a subscription you allow.",
     noInvites: "No pending invites.",
     movie: "Movie together",
     fest: "Family festival",
@@ -236,19 +281,42 @@ const I18N = {
     dinner: "Dinner",
     doctor: "Doctor visit",
     tea: "Tea with relatives",
-    locked: "Evening locked"
+    locked: "Evening locked",
+    accountsNote: "Not a login. Tap a person to see the calendar as they would. A real product would identify who you are; this demo cannot verify that, so it is not faked here.",
+    saved: "Saved on your week",
+    limitsTitle: "What this demo will and will not do",
+    limitsIntro: "Layout stays close to what you already saw. We only change high-confidence items. Unclear or hard-to-verify items stay out of the demo.",
+    limitsInHead: "In this demo",
+    limitsOutHead: "We should expect these later — not delivered here, because this sketch cannot honestly show they work",
+    limitsClose: "OK",
+    limitsInItems: [
+      "This week is shown as real dates, not abstract “days”.",
+      "Adding an activity should land on your week, with a short confirmation.",
+      "Optional location and remark on an activity.",
+      "Tap accounts to switch viewpoint. That is not a real login."
+    ],
+    limitsOutItems: [
+      "Real login / identity.",
+      "Choosing week, month, and year views.",
+      "Outlook-class recurrence (every first Monday, birthdays, anniversaries).",
+      "Notifications — for example a one-month reminder to book an anniversary dinner. Likely later as iOS/Android apps, then browser/page, and email. This page cannot verify OS/app alerts, so we are not adding a settings maze that would look clunky and fake.",
+      "Custom / situational groups (parent–teacher, doctor visits, groupings not thought of yet).",
+      "Photos, stickers, or a heavy public invitation page.",
+      "What 「邀請」 should mean versus share-calendar, group push, and delete-from-my-side-only. Those lines still conflict or are unclear, so this demo does not invent a conclusion."
+    ]
   },
   zh: {
     tagline: "試用草圖：一個人一個日曆。以邀請、群組預設權限或訂閱來分享。此處並非產品決定。",
     lang: "English",
     newEvent: "新增活動",
     reset: "清除並重設",
+    limitsBtn: "示範說明",
     myWeek: "我的一週",
     others: "我可見的情況",
     side: "邀請、群組、訂閱",
     viewing: "目前帳戶",
     pm: "下午", eve: "晚上",
-    days: ["星期一","星期二","星期三","星期四","星期五","星期六","星期日"],
+    weekdays: ["星期一","星期二","星期三","星期四","星期五","星期六","星期日"],
     busy: "忙碌", free: "有空", details: "詳情", open: "公開可參加",
     hidden: "不顯示", join: "加入", accept: "接受", decline: "拒絕",
     invite: "邀請", pending: "待回覆", subscribed: "已訂閱",
@@ -265,9 +333,9 @@ const I18N = {
     shareOpen: "公開——其他人可以加入",
     inviteNone: "不另外邀請",
     dlg: "新增活動",
-    title: "名稱", day: "日子", slot: "時段", share: "分享",
+    title: "名稱", day: "日子", slot: "時段", place: "地點（可選）", remark: "備註（可選）",
     save: "儲存", cancel: "關閉",
-    myHint: "虛線空格即有空。有色格是你自己的活動。其他人透過群組預設、邀請，或你容許的訂閱來見到這一週。",
+    myHint: "這一週用真實日子，不是抽象的 days。虛線空格即有空。有色格是你自己的活動。其他人透過群組預設、邀請，或你容許的訂閱來見到這一週。",
     noInvites: "現時沒有待回覆邀請。",
     movie: "一齊睇戲",
     fest: "屋企做節",
@@ -275,7 +343,29 @@ const I18N = {
     dinner: "晚飯",
     doctor: "睇醫生",
     tea: "同親戚飲茶",
-    locked: "呢個晚上已定"
+    locked: "呢個晚上已定",
+    accountsNote: "這不是登入。撳帳戶只是試用對方會見到的畫面。真正產品需要識別身份；這個示範核實不到登入，所以不做假的登入。",
+    saved: "已加到你的一週",
+    limitsTitle: "這個示範會做／不會做",
+    limitsIntro: "版面大致保留。只改把握較高的項目。意思未清、或難以核實的，這個示範不會假裝已經做到。",
+    limitsInHead: "這個示範做得到",
+    limitsOutHead: "之後應該會有，但這個示範不會做——因為難以核實它是否真的在運作",
+    limitsClose: "知道了",
+    limitsInItems: [
+      "這一週用真實日子，不是抽象的 days。",
+      "新增活動後應出現在你的一週，並有簡短確認。",
+      "活動可選地點、備註。",
+      "撳帳戶切換視角。這不是真正登入。"
+    ],
+    limitsOutItems: [
+      "真正登入／身份核實。",
+      "選擇 week／month／year 檢視。",
+      "Outlook 級重複活動（每月第一個星期一、生日、周年）。",
+      "通知——例如結婚周年一個月前提醒去訂枱。預期之後主要是 iOS／Android app，再是瀏覽器／網頁，亦可配合電郵。這個網頁核實不到系統通知，所以不會做一堆設定，以免又複雜又假。",
+      "自訂／情境群組（見家長、睇醫生、尚未想到的 grouping）。",
+      "相、sticker，或載入很重的公開邀請頁。",
+      "「邀請」相對 share calendar、群組直篤、以及只在自己這邊刪除。這幾句仍然可能衝突或未清，所以這個示範不下產品結論。"
+    ]
   }
 };
 
@@ -315,6 +405,27 @@ function loadState() {
 }
 function save() { localStorage.setItem(STATE_KEY, JSON.stringify(state)); }
 
+function fmtDay(d) {
+  if (lang === "zh") {
+    return `${d.getMonth() + 1}月${d.getDate()}日\n${t("weekdays")[(d.getDay() + 6) % 7]}`;
+  }
+  return `${t("weekdays")[(d.getDay() + 6) % 7]}\n${d.getDate()} ${d.toLocaleString("en", { month: "short" })}`;
+}
+function fmtDayOneLine(d) {
+  if (lang === "zh") return `${d.getMonth() + 1}月${d.getDate()}日（${t("weekdays")[(d.getDay() + 6) % 7]}）`;
+  return `${t("weekdays")[(d.getDay() + 6) % 7]} ${d.getDate()} ${d.toLocaleString("en", { month: "short" })}`;
+}
+function fmtDayShort(d) {
+  if (lang === "zh") return `${d.getDate()}/${d.getMonth() + 1}`;
+  return String(d.getDate());
+}
+function weekRangeLabel() {
+  const a = WEEK[0], b = WEEK[6];
+  if (lang === "zh") return `${a.getFullYear()}年${a.getMonth() + 1}月${a.getDate()}日–${b.getMonth() + 1}月${b.getDate()}日`;
+  const opt = { day: "numeric", month: "short" };
+  return `${a.toLocaleDateString("en-GB", opt)} – ${b.toLocaleDateString("en-GB", opt)} ${b.getFullYear()}`;
+}
+
 function stronger(a, b) {
   const rank = { none: 0, busy: 1, open: 2, details: 3, full: 4 };
   return (rank[a] || 0) >= (rank[b] || 0) ? a : b;
@@ -345,8 +456,8 @@ function eventAccess(viewerId, ev) {
   return cal === "details" ? "details" : cal === "busy" ? "busy" : "none";
 }
 
-function eventAt(ownerId, day, slot) {
-  return state.events.find(e => e.ownerId === ownerId && e.day === day && e.slot === slot);
+function eventsAt(ownerId, day, slot) {
+  return state.events.filter(e => e.ownerId === ownerId && e.day === day && e.slot === slot);
 }
 
 function applySkin() {
@@ -370,22 +481,43 @@ function renderAccounts() {
 
 function titleOf(ev) { return ev.titleKey ? t(ev.titleKey) : (ev.title || ""); }
 
+function extrasHtml(ev, access) {
+  if (!ev || access === "none" || access === "busy") return "";
+  const bits = [];
+  if (ev.place) bits.push(ev.place);
+  if (ev.remark && (access === "full" || access === "details")) bits.push(ev.remark);
+  return bits.length ? `<span class="sub">${bits.join(" · ")}</span>` : "";
+}
+
 function cellHtml(ev, access) {
   if (!ev || access === "none") return `<span class="muted">${t("free")}</span>`;
   if (access === "busy") return `<b>${t("busy")}</b>`;
-  if (access === "open") return `<b>${t("open")}</b>${titleOf(ev)}`;
-  return `<b>${titleOf(ev)}</b>`;
+  if (access === "open") return `<b>${t("open")}</b>${titleOf(ev)}${extrasHtml(ev, access)}`;
+  return `<b>${titleOf(ev)}</b>${extrasHtml(ev, access)}`;
+}
+
+function stackHtml(list, accessFn) {
+  if (!list.length) return `<span class="muted">${t("free")}</span>`;
+  return list.map(ev => cellHtml(ev, accessFn(ev))).join("");
+}
+
+function toast(msg) {
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.classList.add("show");
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => el.classList.remove("show"), 2600);
 }
 
 function renderMyWeek() {
   const host = document.getElementById("myWeek");
-  let html = `<div></div>` + DAYS.map(d => `<div class="dh">${t("days")[d]}</div>`).join("");
+  let html = `<div></div>` + DAYS.map(d => `<div class="dh">${fmtDay(WEEK[d])}</div>`).join("");
   for (const slot of SLOTS) {
     html += `<div class="lab">${t(slot)}</div>`;
     for (const day of DAYS) {
-      const ev = eventAt(state.viewer, day, slot);
-      const cls = !ev ? "free" : ev.open ? "open" : "detail";
-      html += `<div class="slot ${cls}">${cellHtml(ev, ev ? "full" : "none")}</div>`;
+      const list = eventsAt(state.viewer, day, slot);
+      const cls = !list.length ? "free" : list.some(ev => ev.open) ? "open" : "detail";
+      html += `<div class="slot ${cls}">${stackHtml(list, () => "full")}</div>`;
     }
   }
   host.innerHTML = html;
@@ -393,14 +525,16 @@ function renderMyWeek() {
 
 function renderOthers() {
   const host = document.getElementById("others");
+  const head = DAYS.map(d => `<div class="c head">${fmtDayShort(WEEK[d])}</div>`).join("");
   host.innerHTML = PEOPLE.filter(p => p.id !== state.viewer).map(p => {
     const access = calendarAccess(state.viewer, p.id);
     const cells = SLOTS.map(slot => DAYS.map(day => {
-      const ev = eventAt(p.id, day, slot);
-      const acc = ev ? eventAccess(state.viewer, ev) : "none";
-      const label = cellHtml(ev, acc);
-      const kind = !ev || acc === "none" ? "" : acc === "busy" ? "busy" : acc === "open" ? "open" : "detail";
-      return `<div class="c ${kind}">${acc === "none" ? "" : label}</div>`;
+      const list = eventsAt(p.id, day, slot);
+      const accs = list.map(ev => eventAccess(state.viewer, ev));
+      const visible = list.filter((_, i) => accs[i] !== "none");
+      const label = visible.length ? visible.map((ev, i) => cellHtml(ev, eventAccess(state.viewer, ev))).join("") : "";
+      const kind = !visible.length ? "" : accs.includes("busy") && visible.every(ev => eventAccess(state.viewer, ev) === "busy") ? "busy" : accs.includes("open") ? "open" : "detail";
+      return `<div class="c ${kind}">${label}</div>`;
     }).join("")).join("");
     const canSub = p.subscribeCap !== "none";
     const subbed = state.subs.some(s => s.fromId === state.viewer && s.toId === p.id);
@@ -409,7 +543,7 @@ function renderOthers() {
       : "";
     return `<div class="person-row">
       <div class="meta"><strong>${nameOf(p.id)}</strong><span class="muted">${t(access === "none" ? "hidden" : access)}${subBtn}</span></div>
-      <div class="tiny">${cells}</div>
+      <div class="tiny">${head}${cells}</div>
     </div>`;
   }).join("");
   host.querySelectorAll("[data-sub]").forEach(b => b.onclick = () => {
@@ -469,7 +603,7 @@ function renderSide() {
 
 function fillDialog() {
   const form = document.getElementById("eventForm");
-  form.day.innerHTML = DAYS.map(d => `<option value="${d}">${t("days")[d]}</option>`).join("");
+  form.day.innerHTML = DAYS.map(d => `<option value="${d}">${fmtDayOneLine(WEEK[d])}</option>`).join("");
   form.slot.innerHTML = `<option value="pm">${t("pm")}</option><option value="eve">${t("eve")}</option>`;
   form.share.innerHTML = ["private","partner","direct","extended","open"].map(k => {
     const label = { private: t("sharePrivate"), partner: t("sharePartner"), direct: t("shareDirect"),
@@ -480,26 +614,40 @@ function fillDialog() {
     PEOPLE.filter(p => p.id !== state.viewer).map(p => `<option value="${p.id}">${nameOf(p.id)}</option>`).join("");
 }
 
+function fillLimits() {
+  document.getElementById("limitsTitle").textContent = t("limitsTitle");
+  document.getElementById("limitsIntro").textContent = t("limitsIntro");
+  document.getElementById("limitsInHead").textContent = t("limitsInHead");
+  document.getElementById("limitsOutHead").textContent = t("limitsOutHead");
+  document.getElementById("limitsClose").textContent = t("limitsClose");
+  document.getElementById("limitsIn").innerHTML = t("limitsInItems").map(x => `<li>${x}</li>`).join("");
+  document.getElementById("limitsOut").innerHTML = t("limitsOutItems").map(x => `<li>${x}</li>`).join("");
+}
+
 function renderChrome() {
   document.documentElement.lang = lang === "zh" ? "zh-HK" : "en";
   document.getElementById("tagline").textContent = t("tagline");
   document.getElementById("langBtn").textContent = t("lang");
+  document.getElementById("limitsBtn").textContent = t("limitsBtn");
   document.getElementById("newBtn").textContent = t("newEvent");
   document.getElementById("resetBtn").textContent = t("reset");
-  document.getElementById("myWeekTitle").textContent = `${t("myWeek")} · ${t("viewing")} ${nameOf(state.viewer)}`;
+  document.getElementById("myWeekTitle").textContent = `${t("myWeek")} · ${weekRangeLabel()} · ${t("viewing")} ${nameOf(state.viewer)}`;
   document.getElementById("othersTitle").textContent = t("others");
   document.getElementById("sideTitle").textContent = t("side");
   document.getElementById("myHint").textContent = t("myHint");
+  document.getElementById("accountsNote").textContent = t("accountsNote");
   document.getElementById("dlgTitle").textContent = t("dlg");
   document.getElementById("lblTitle").textContent = t("title");
   document.getElementById("lblDay").textContent = t("day");
   document.getElementById("lblSlot").textContent = t("slot");
-  document.getElementById("lblShare").textContent = t("sharePrivate").split(" ")[0] ? t("title") && "分享 / Share" : "";
+  document.getElementById("lblPlace").textContent = t("place");
+  document.getElementById("lblRemark").textContent = t("remark");
   document.getElementById("lblShare").textContent = lang === "zh" ? "分享" : "Share";
   document.getElementById("lblInvite").textContent = t("invite");
   document.getElementById("saveBtn").textContent = t("save");
   document.getElementById("cancelBtn").textContent = t("cancel");
   fillDialog();
+  fillLimits();
 }
 
 function render() {
@@ -523,14 +671,20 @@ document.getElementById("resetBtn").onclick = () => {
 };
 document.getElementById("newBtn").onclick = () => document.getElementById("dlg").showModal();
 document.getElementById("cancelBtn").onclick = () => document.getElementById("dlg").close();
+document.getElementById("limitsBtn").onclick = () => document.getElementById("limitsDlg").showModal();
+document.getElementById("limitsClose").onclick = () => document.getElementById("limitsDlg").close();
 document.getElementById("eventForm").onsubmit = (e) => {
   e.preventDefault();
   const f = e.target;
   const id = "e" + Date.now();
   const share = f.share.value;
+  const day = Number(f.day.value);
+  const slot = f.slot.value;
+  const title = f.title.value.trim();
   state.events.push({
-    id, ownerId: state.viewer, day: Number(f.day.value), slot: f.slot.value,
-    titleKey: null, title: f.title.value, share, open: share === "open", joined: []
+    id, ownerId: state.viewer, day, slot,
+    titleKey: null, title, place: f.place.value.trim(), remark: f.remark.value.trim(),
+    share, open: share === "open", joined: []
   });
   if (f.invite.value) {
     state.invites.push({ id: "i"+Date.now(), eventId: id, fromId: state.viewer, toId: f.invite.value, status: "pending" });
@@ -538,9 +692,14 @@ document.getElementById("eventForm").onsubmit = (e) => {
   f.reset();
   document.getElementById("dlg").close();
   save(); render();
+  toast(`${t("saved")} · ${title} · ${fmtDayOneLine(WEEK[day])} ${t(slot)}`);
 };
 
 render();
+if (!localStorage.getItem(LIMITS_KEY)) {
+  document.getElementById("limitsDlg").showModal();
+  localStorage.setItem(LIMITS_KEY, "1");
+}
 </script>
 </body>
 </html>

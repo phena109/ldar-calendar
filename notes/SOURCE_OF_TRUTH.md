@@ -196,8 +196,39 @@ These are **gaps**, not decisions:
 | Invites | Needed (matches Janice). |
 | Subscriptions | Also a possibility (follow someone’s free-busy / calendar stream); should be **controllable** (what others can subscribe to, revoke, tier). Not validated with Janice yet. |
 | Metaphor | Don’t freeze “email vs phone+calendar”; observe later. |
-| POC bar | Interaction sketch > MVP. **Locally workable** static page; cookie/localStorage; clear/reset → **same seed**. Fake week labels OK (no real dates). UI should feel appetising, not wireframe-ugly. |
+| POC bar | Interaction sketch > MVP. **Locally workable** static page; cookie/localStorage; clear/reset → **same seed**. Janice 2026-09-03 asked for **日子 / dates** instead of abstract demo “days” — week now uses real calendar dates. UI should feel appetising, not wireframe-ugly. |
 | Groups (new) | **Permission profiles** with default access behaviour. POC set: **Partner**, **Direct family**, **Extended family**. |
 | i18n | **English + Hong Kong Traditional Chinese** (zh-HK). Prefer **most common HK terms**; not TW-specific, not Mainland simplified/phrasing; generic Traditional only if no HK-friendly term. |
 
-**Last updated:** 2026-09-01 (SoT extract + 合久必分 correction + provisional collaborator notes).
+**Last updated:** 2026-09-03 (demo feedback captured; dates in POC; no freeze on 邀請).
+
+---
+
+## 13. Demo feedback — Janice (WhatsApp, 2026-09-03)
+
+**Source:** `sources/chats/demo-feedback-*.png` + `TRANSCRIPT.md` Block G. Idea-owner after trying `https://phena109.github.io/ldar-calendar/`. Layout: 「版面上就咁睇係ok既」.
+
+**Stance:** Conservative. High-confidence visual items may change in the sketch. Fragile / unverifiable items: say so in the demo notes popup; do not fake them. Conflicting or unclear lines: backlog — do not invent a product conclusion.
+
+### What she actually said (not our earlier synthesis)
+
+- Login? If not, how to identify who? Then add one seemed unsuccessful.
+- 「可唔可以用日子 instead of days?」 Collaborator (phena109): she meant **date** instead of the demo’s **days**. Same neighbourhood as copy/i18n, but the demo change is **real dates on the week**, not only translating the word.
+- Groups self-chosen? Examples: kid parent–teacher → mum wants in and to pull dad; doctor; 「堆未諗到既 grouping」.
+- Can choose week, month, year.
+- Recurrence like Outlook (every first Monday; 生日 / anniversary).
+- If it is an **app**, notifications? e.g. wedding anniversary, remind **1 month** ahead to book dinner. Collaborator: likely **apps (iOS and Android)**; channel order **app > browser > page**, also email. Do **not** invent a complicated settings surface; cutting corners here will read as clunky.
+- Event already has weekday — option for location / remark?
+- 「我唔係好 get 個『邀請』」; wants an option because this is **kinda share calendar**; with grouping she can **直篤**; if she does not want to see it, WhatsApp-like **del from my side only**. Collaborator: **not sure either — re-analyse; do not jump**. Earlier SoT still has **要 meeting invite**. Treat as **unresolved**, not as three decided verbs.
+- Advanced: photo / sticker; public event might be a whole invitation; **keep it simple**, don’t make loading heavy.
+- Close: 「暫時咁多先」.
+
+### Sketch response (2026-09-03)
+
+| Treat as | Item |
+|----------|------|
+| Changed in demo | Real calendar dates on the week; add-activity confirmation + stacked same-slot events (so add is visible); optional location / remark; caption that account pills are not login; first-open **示範說明** popup |
+| Popup / not in this demo | Real login; week/month/year switch; Outlook recurrence; notifications (cannot verify on a static page); custom groups; photos/stickers/heavy invitation; 邀請 vs share-calendar vs delete-my-side |
+| Backlog, no conclusion | B6 邀請 / 直篤 / del-from-my-side vs earlier meeting-invite. Custom groups. App notification design (keep settings simple if ever built). |
+
+Do not fold collaborator packaging (app > browser > page + email) into Janice canon until she says it.
