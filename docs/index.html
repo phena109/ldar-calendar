@@ -32,7 +32,7 @@
     }
     button, select, input { font: inherit; }
     button { cursor: pointer; }
-    .wrap { max-width: 1280px; margin: 0 auto; padding: 22px 20px 64px; }
+    .wrap { max-width: 1280px; margin: 0 auto; padding: 36px 20px 64px; }
     header.app {
       display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
       margin-bottom: 18px;
@@ -164,9 +164,17 @@
     body[data-layout="outlook"] .brand h1 { letter-spacing: 0; font-weight: 600; font-size: 22px; }
     body[data-layout="cute"] .brand h1 { letter-spacing: .2em; }
     body[data-layout="cute"] .card { border-radius: 24px; }
+    .build {
+      position: fixed; top: 6px; left: 8px; z-index: 60;
+      font-size: 10px; font-weight: 800; line-height: 1.2;
+      font-variant-numeric: tabular-nums; letter-spacing: .02em;
+      color: #111; background: #ffe600; border: 1px solid #111;
+      padding: 2px 6px; max-width: calc(100vw - 16px);
+    }
   </style>
 </head>
 <body>
+  <div class="build" id="buildStamp"></div>
   <div class="wrap">
     <header class="app">
       <div class="brand">
@@ -236,6 +244,7 @@
   <div id="toast" role="status"></div>
 
 <script>
+const BUILD = "2026-09-03 09:32 AEST";
 const LANG_KEY = "ldar-poc-lang";
 const STATE_KEY = "ldar-poc-state-v4";
 const LIMITS_KEY = "ldar-poc-seen-limits-v5";
@@ -300,7 +309,7 @@ const I18N = {
     tagline: "A sketch of one person, one calendar — sharing by invite, group default, or subscription. Nothing here is a product decision.",
     lang: "繁體中文（香港）",
     newEvent: "New activity",
-    reset: "Clear & reset",
+    reset: "Clear cache & reset",
     limitsBtn: "Demo notes",
     myWeek: "My calendar",
     viewWeek: "Week", viewMonth: "Month", viewYear: "Year",
@@ -368,7 +377,7 @@ const I18N = {
     tagline: "試用草圖：一個人一個日曆。以邀請、群組預設權限或訂閱來分享。此處並非產品決定。",
     lang: "English",
     newEvent: "新增活動",
-    reset: "清除並重設",
+    reset: "清除快取並重設",
     limitsBtn: "示範說明",
     myWeek: "我的日曆",
     viewWeek: "週", viewMonth: "月", viewYear: "年",
@@ -788,6 +797,7 @@ function fillLimits() {
 
 function renderChrome() {
   document.documentElement.lang = lang === "zh" ? "zh-HK" : "en";
+  document.getElementById("buildStamp").textContent = BUILD;
   document.getElementById("tagline").textContent = t("tagline");
   document.getElementById("langBtn").textContent = t("lang");
   document.getElementById("limitsBtn").textContent = t("limitsBtn");
@@ -831,9 +841,18 @@ document.getElementById("langBtn").onclick = () => {
   render();
 };
 document.getElementById("resetBtn").onclick = () => {
-  state = seed();
-  save();
-  render();
+  // ponytail: drop this sketch's storage + Cache API + SW, then bypass HTTP cache
+  Object.keys(localStorage).filter(k => k.startsWith("ldar-poc")).forEach(k => localStorage.removeItem(k));
+  const go = () => {
+    const url = new URL(location.href);
+    url.searchParams.set("v", BUILD.replace(/\s+/g, "_"));
+    url.searchParams.set("r", String(Date.now()));
+    location.replace(url.href);
+  };
+  const jobs = [];
+  if (window.caches) jobs.push(caches.keys().then(keys => Promise.all(keys.filter(k => /ldar/i.test(k)).map(k => caches.delete(k)))));
+  if (navigator.serviceWorker) jobs.push(navigator.serviceWorker.getRegistrations().then(rs => Promise.all(rs.map(r => r.unregister()))));
+  Promise.all(jobs).catch(() => {}).then(go);
 };
 document.getElementById("newBtn").onclick = () => document.getElementById("dlg").showModal();
 document.getElementById("cancelBtn").onclick = () => document.getElementById("dlg").close();
