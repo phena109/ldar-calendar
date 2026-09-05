@@ -32,7 +32,7 @@
     }
     button, select, input { font: inherit; }
     button { cursor: pointer; }
-    .wrap { max-width: 1280px; margin: 0 auto; padding: 22px 20px 64px; }
+    .wrap { max-width: 1280px; margin: 0 auto; padding: 36px 20px 64px; }
     header.app {
       display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
       margin-bottom: 18px;
@@ -51,8 +51,9 @@
     .btn.primary { background: var(--accent); color: #fffaf6; border-color: transparent; }
     .btn.danger { background: transparent; }
     .accounts {
-      display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px;
+      display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px;
     }
+    .accounts-note { font-size: 12px; color: var(--muted); margin: 0 0 16px; line-height: 1.4; }
     .pill {
       display: flex; align-items: center; gap: 8px;
       padding: 7px 12px 7px 7px; border-radius: 999px;
@@ -78,7 +79,7 @@
     .dh, .slot, .lab {
       min-height: 72px; border-radius: 12px; padding: 8px;
     }
-    .dh { min-height: auto; text-align: center; font-size: 12px; color: var(--muted); padding: 4px; }
+    .dh { min-height: auto; text-align: center; font-size: 11px; color: var(--muted); padding: 4px; line-height: 1.35; white-space: pre-line; }
     .lab { display: grid; place-items: center; color: var(--muted); font-size: 12px; background: rgba(255,255,255,.35); }
     .slot {
       background: rgba(255,255,255,.45); border: 1px dashed var(--line); font-size: 12px; line-height: 1.35;
@@ -88,6 +89,7 @@
     .slot.open { background: color-mix(in srgb, #d4a017 18%, white); border-style: solid; }
     .slot.free { color: var(--muted); }
     .slot b { display: block; font-size: 11px; font-weight: 650; }
+    .slot .sub { display: block; font-size: 10px; color: var(--muted); }
     .mini-week { display: grid; gap: 10px; }
     .person-row { border: 1px solid var(--line); border-radius: 14px; padding: 10px; background: rgba(255,255,255,.4); }
     .person-row .meta { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 8px; font-size: 12px; }
@@ -98,6 +100,7 @@
       height: 46px; border-radius: 8px; font-size: 10px; padding: 4px; background: rgba(255,255,255,.5);
       border: 1px solid var(--line); overflow: hidden;
     }
+    .tiny .c.head { height: auto; min-height: 0; background: transparent; border: 0; color: var(--muted); text-align: center; padding: 0 0 4px; }
     .list { display: flex; flex-direction: column; gap: 8px; }
     .item {
       border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px; background: rgba(255,255,255,.5);
@@ -113,6 +116,7 @@
       border: 0; border-radius: 20px; padding: 0; width: min(420px, calc(100vw - 24px));
       box-shadow: var(--shadow); background: #fffaf6; color: var(--ink);
     }
+    dialog.wide { width: min(520px, calc(100vw - 24px)); }
     dialog::backdrop { background: rgba(28, 18, 12, .35); }
     .dlg { padding: 18px; display: flex; flex-direction: column; gap: 10px; }
     label { font-size: 12px; color: var(--muted); display: flex; flex-direction: column; gap: 4px; }
@@ -120,9 +124,57 @@
       border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; background: white;
     }
     .hint { font-size: 12px; color: var(--muted); margin-top: 8px; line-height: 1.45; }
+    .limits { font-size: 13px; line-height: 1.5; }
+    .limits h3 { margin: 12px 0 4px; font-size: 13px; }
+    .limits ul { margin: 0; padding-left: 1.15em; }
+    .limits li { margin: 4px 0; }
+    #toast {
+      position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%);
+      background: var(--ink); color: #fffaf6; padding: 10px 16px; border-radius: 999px;
+      font-size: 13px; z-index: 40; opacity: 0; pointer-events: none; transition: opacity .25s;
+      max-width: calc(100vw - 32px);
+    }
+    #toast.show { opacity: 1; }
+    .row-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+    .row-head h2 { margin: 0; }
+    .view-bar .btn.on { background: var(--accent); color: #fffaf6; border-color: transparent; }
+    .hol { color: var(--accent); font-size: 10px; font-weight: 650; display: block; }
+    .month { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+    .month .dh { min-height: auto; }
+    .mcell { min-height: 78px; border-radius: 10px; padding: 6px; background: rgba(255,255,255,.45); border: 1px solid var(--line); font-size: 11px; }
+    .mcell.out { opacity: .35; }
+    .mcell .n { font-weight: 650; display: block; }
+    .year { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    @media (max-width: 720px) { .year { grid-template-columns: 1fr 1fr; } }
+    .ymini { border: 1px solid var(--line); border-radius: 12px; padding: 8px; background: rgba(255,255,255,.4); cursor: pointer; }
+    .ymini strong { display: block; font-size: 12px; margin-bottom: 6px; }
+    .ymini .g { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+    .ymini i { display: block; aspect-ratio: 1; border-radius: 3px; background: rgba(255,255,255,.5); font-style: normal; font-size: 8px; text-align: center; }
+    .ymini i.hol { background: color-mix(in srgb, var(--accent) 35%, white); }
+    .ymini i.ev { background: color-mix(in srgb, var(--accent-2) 35%, white); }
+    body[data-layout="outlook"] {
+      font-family: "Segoe UI", "PingFang HK", "Noto Sans HK", ui-sans-serif, system-ui, sans-serif;
+    }
+    body[data-layout="outlook"] .card,
+    body[data-layout="outlook"] .item,
+    body[data-layout="outlook"] .person-row,
+    body[data-layout="outlook"] .slot,
+    body[data-layout="outlook"] .mcell { border-radius: 2px; }
+    body[data-layout="outlook"] .btn, body[data-layout="outlook"] .pill { border-radius: 2px; }
+    body[data-layout="outlook"] .brand h1 { letter-spacing: 0; font-weight: 600; font-size: 22px; }
+    body[data-layout="cute"] .brand h1 { letter-spacing: .2em; }
+    body[data-layout="cute"] .card { border-radius: 24px; }
+    .build {
+      position: fixed; top: 6px; left: 8px; z-index: 60;
+      font-size: 10px; font-weight: 800; line-height: 1.2;
+      font-variant-numeric: tabular-nums; letter-spacing: .02em;
+      color: #111; background: #ffe600; border: 1px solid #111;
+      padding: 2px 6px; max-width: calc(100vw - 16px);
+    }
   </style>
 </head>
 <body>
+  <div class="build" id="buildStamp"></div>
   <div class="wrap">
     <header class="app">
       <div class="brand">
@@ -130,16 +182,21 @@
         <p id="tagline"></p>
       </div>
       <div class="tools">
+        <button class="btn" id="limitsBtn" type="button"></button>
         <button class="btn" id="langBtn" type="button"></button>
         <button class="btn primary" id="newBtn" type="button"></button>
         <button class="btn danger" id="resetBtn" type="button"></button>
       </div>
     </header>
     <div class="accounts" id="accounts"></div>
+    <p class="accounts-note" id="accountsNote"></p>
     <div class="grid">
       <section class="card">
-        <h2 id="myWeekTitle"></h2>
-        <div class="week" id="myWeek"></div>
+        <div class="row-head">
+          <h2 id="myWeekTitle"></h2>
+          <div class="tools view-bar" id="viewBar"></div>
+        </div>
+        <div id="myCal"></div>
         <p class="hint" id="myHint"></p>
       </section>
       <section class="card">
@@ -159,6 +216,8 @@
       <label><span id="lblTitle"></span><input name="title" required maxlength="40" /></label>
       <label><span id="lblDay"></span><select name="day"></select></label>
       <label><span id="lblSlot"></span><select name="slot"></select></label>
+      <label><span id="lblPlace"></span><input name="place" maxlength="40" /></label>
+      <label><span id="lblRemark"></span><input name="remark" maxlength="80" /></label>
       <label><span id="lblShare"></span><select name="share"></select></label>
       <label><span id="lblInvite"></span><select name="invite"></select></label>
       <div class="tools">
@@ -168,29 +227,76 @@
     </form>
   </dialog>
 
+  <dialog id="limitsDlg" class="wide">
+    <div class="dlg limits">
+      <h2 id="limitsTitle"></h2>
+      <p id="limitsIntro" class="muted"></p>
+      <h3 id="limitsInHead"></h3>
+      <ul id="limitsIn"></ul>
+      <h3 id="limitsOutHead"></h3>
+      <ul id="limitsOut"></ul>
+      <div class="tools">
+        <button class="btn primary" type="button" id="limitsClose"></button>
+      </div>
+    </div>
+  </dialog>
+
+  <div id="toast" role="status"></div>
+
 <script>
+const BUILD = "2026-09-03 09:32 AEST";
 const LANG_KEY = "ldar-poc-lang";
-const STATE_KEY = "ldar-poc-state-v2";
+const STATE_KEY = "ldar-poc-state-v4";
+const LIMITS_KEY = "ldar-poc-seen-limits-v5";
+const VIEW_KEY = "ldar-poc-view";
 const DAYS = [0,1,2,3,4,5,6];
 const SLOTS = ["pm", "eve"];
 
+const WEEK = (() => {
+  const now = new Date();
+  const dow = now.getDay();
+  const offset = dow === 0 ? -6 : 1 - dow;
+  const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset);
+  return DAYS.map(i => new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + i));
+})();
+
 const PEOPLE = [
-  { id: "self", en: "You", zh: "自己", initial: "自", color: "#c45c4a",
-    skin: { bg:"#f6eee6", ink:"#3b241c", accent:"#c45c4a", accent2:"#7a4b3a" },
+  { id: "self", en: "Janice", zh: "Janice", initial: "J", layout: "cute", color: "#c45c4a",
+    skin: { bg:"#f7e8ef", ink:"#3b241c", accent:"#c45c4a", accent2:"#d48aa0" },
     subscribeCap: "busy" },
-  { id: "partner", en: "Partner", zh: "伴侶", initial: "伴", color: "#2f5d8a",
-    skin: { bg:"#e9eef3", ink:"#1b2430", accent:"#2f5d8a", accent2:"#3d6b63" },
+  { id: "partner", en: "Kai", zh: "阿啟", initial: "啟", layout: "outlook", color: "#2f5d8a",
+    skin: { bg:"#e8eaed", ink:"#1b2430", accent:"#2f5d8a", accent2:"#3d6b63" },
     subscribeCap: "busy" },
-  { id: "parent", en: "Parent", zh: "家長", initial: "長", color: "#4a7c59",
+  { id: "parent", en: "Mum", zh: "媽媽", initial: "媽", layout: "warm", color: "#4a7c59",
     skin: { bg:"#eef3ea", ink:"#243024", accent:"#4a7c59", accent2:"#c45c4a" },
     subscribeCap: "busy" },
-  { id: "relative", en: "Relative", zh: "親戚", initial: "親", color: "#7a5a8e",
+  { id: "relative", en: "Yee", zh: "美姨", initial: "姨", layout: "warm", color: "#7a5a8e",
     skin: { bg:"#f3eef6", ink:"#2c2433", accent:"#7a5a8e", accent2:"#4a7c59" },
     subscribeCap: "busy" },
-  { id: "friend", en: "Friend", zh: "朋友", initial: "友", color: "#a67c2d",
+  { id: "friend", en: "Sam", zh: "Sam", initial: "S", layout: "warm", color: "#a67c2d",
     skin: { bg:"#f3f0e4", ink:"#2a2618", accent:"#a67c2d", accent2:"#2f5d8a" },
     subscribeCap: "none" }
 ];
+// ponytail: 2026 HK gazetted general holidays only (GovHK). Sundays not marked.
+const HOLIDAYS = {
+  "2026-01-01": { zh: "一月一日", en: "New Year's Day" },
+  "2026-02-17": { zh: "農曆年初一", en: "Lunar New Year" },
+  "2026-02-18": { zh: "農曆年初二", en: "Lunar New Year" },
+  "2026-02-19": { zh: "農曆年初三", en: "Lunar New Year" },
+  "2026-04-03": { zh: "耶穌受難節", en: "Good Friday" },
+  "2026-04-04": { zh: "耶穌受難節翌日", en: "Day after Good Friday" },
+  "2026-04-06": { zh: "清明節翌日", en: "Day after Ching Ming" },
+  "2026-04-07": { zh: "復活節星期一翌日", en: "Day after Easter Monday" },
+  "2026-05-01": { zh: "勞動節", en: "Labour Day" },
+  "2026-05-25": { zh: "佛誕翌日", en: "Day after Buddha's Birthday" },
+  "2026-06-19": { zh: "端午節", en: "Tuen Ng" },
+  "2026-07-01": { zh: "香港特別行政區成立紀念日", en: "HKSAR Establishment Day" },
+  "2026-09-26": { zh: "中秋節翌日", en: "Day after Mid-Autumn" },
+  "2026-10-01": { zh: "國慶日", en: "National Day" },
+  "2026-10-19": { zh: "重陽節翌日", en: "Day after Chung Yeung" },
+  "2026-12-25": { zh: "聖誕節", en: "Christmas Day" },
+  "2026-12-26": { zh: "聖誕節後第一個周日", en: "First weekday after Christmas" }
+};
 
 const GROUPS = [
   { id: "partner", members: ["self","partner"], defaultAccess: "details" },
@@ -203,13 +309,15 @@ const I18N = {
     tagline: "A sketch of one person, one calendar — sharing by invite, group default, or subscription. Nothing here is a product decision.",
     lang: "繁體中文（香港）",
     newEvent: "New activity",
-    reset: "Clear & reset",
-    myWeek: "My week",
+    reset: "Clear cache & reset",
+    limitsBtn: "Demo notes",
+    myWeek: "My calendar",
+    viewWeek: "Week", viewMonth: "Month", viewYear: "Year",
     others: "What I can see",
     side: "Invites, groups, subscriptions",
     viewing: "Viewing as",
     pm: "Afternoon", eve: "Evening",
-    days: ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"],
+    weekdays: ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"],
     busy: "Busy", free: "Free", details: "Details", open: "Open to join",
     hidden: "Not shown", join: "Join", accept: "Accept", decline: "Decline",
     invite: "Invite", pending: "Pending", subscribed: "Subscribed",
@@ -226,9 +334,9 @@ const I18N = {
     shareOpen: "Open — anyone may join",
     inviteNone: "No extra invite",
     dlg: "Add activity",
-    title: "Title", day: "Day", slot: "Time", share: "Share",
+    title: "Title", day: "Date", slot: "Time", place: "Location (optional)", remark: "Remark (optional)",
     save: "Save", cancel: "Close",
-    myHint: "Dashed empty cells are free. Coloured cells are yours. Other people see this week through group defaults, invites, or a subscription you allow.",
+    myHint: "Same data, different layout per person. This week uses real dates. Hong Kong 2026 general holidays are marked. Dashed empty cells are free.",
     noInvites: "No pending invites.",
     movie: "Movie together",
     fest: "Family festival",
@@ -236,19 +344,48 @@ const I18N = {
     dinner: "Dinner",
     doctor: "Doctor visit",
     tea: "Tea with relatives",
-    locked: "Evening locked"
+    locked: "Evening locked",
+    bday: "Mum's birthday",
+    yearly: "Yearly",
+    accountsNote: "Not a login. Tap a person to see their calendar and layout. Janice is cute; Kai is Outlook-like. A real product would identify who you are; that is not faked here.",
+    holidayNote: "HK 2026 general holidays (gazetted). Display only — not blocking time.",
+    saved: "Saved on your week",
+    limitsTitle: "What this demo will and will not do",
+    limitsIntro: "Layout stays close to what you already saw. We only change high-confidence items. Unclear or hard-to-verify items stay out of the demo.",
+    limitsInHead: "In this demo",
+    limitsOutHead: "We should expect these later — not delivered here, because this sketch cannot honestly show they work",
+    limitsClose: "OK",
+    limitsInItems: [
+      "Named people (Janice, 阿啟, 媽媽, 美姨, Sam) — still not a login.",
+      "Shared data, different layout: Janice cute / 阿啟 Outlook-like.",
+      "Week / month / year on your calendar.",
+      "Real dates. Optional location and remark. Add confirms on your week.",
+      "Hong Kong 2026 gazetted general holidays marked (not a holiday product; display only).",
+      "A yearly birthday tag as a recurrence hint — not Outlook RRULE."
+    ],
+    limitsOutItems: [
+      "Real login / identity.",
+      "Outlook-class recurrence (every first Monday, exceptions).",
+      "Notifications — for example a one-month reminder to book an anniversary dinner. Likely later as iOS/Android apps, then browser/page, and email. This page cannot verify OS/app alerts, so we are not adding a settings maze.",
+      "Custom / situational groups (parent–teacher, doctor visits, groupings not thought of yet).",
+      "Photos, stickers, or a heavy public invitation page.",
+      "What 「邀請」 should mean versus share-calendar, group push, and delete-from-my-side-only. Still unclear — no product conclusion.",
+      "Delegate access as its own control. Access tiers already exist via groups."
+    ]
   },
   zh: {
     tagline: "試用草圖：一個人一個日曆。以邀請、群組預設權限或訂閱來分享。此處並非產品決定。",
     lang: "English",
     newEvent: "新增活動",
-    reset: "清除並重設",
-    myWeek: "我的一週",
+    reset: "清除快取並重設",
+    limitsBtn: "示範說明",
+    myWeek: "我的日曆",
+    viewWeek: "週", viewMonth: "月", viewYear: "年",
     others: "我可見的情況",
     side: "邀請、群組、訂閱",
     viewing: "目前帳戶",
     pm: "下午", eve: "晚上",
-    days: ["星期一","星期二","星期三","星期四","星期五","星期六","星期日"],
+    weekdays: ["星期一","星期二","星期三","星期四","星期五","星期六","星期日"],
     busy: "忙碌", free: "有空", details: "詳情", open: "公開可參加",
     hidden: "不顯示", join: "加入", accept: "接受", decline: "拒絕",
     invite: "邀請", pending: "待回覆", subscribed: "已訂閱",
@@ -265,9 +402,9 @@ const I18N = {
     shareOpen: "公開——其他人可以加入",
     inviteNone: "不另外邀請",
     dlg: "新增活動",
-    title: "名稱", day: "日子", slot: "時段", share: "分享",
+    title: "名稱", day: "日子", slot: "時段", place: "地點（可選）", remark: "備註（可選）",
     save: "儲存", cancel: "關閉",
-    myHint: "虛線空格即有空。有色格是你自己的活動。其他人透過群組預設、邀請，或你容許的訂閱來見到這一週。",
+    myHint: "同一份資料，不同人不同版面。這一週用真實日子。已標示 2026 香港憲報公眾假期。虛線空格即有空。",
     noInvites: "現時沒有待回覆邀請。",
     movie: "一齊睇戲",
     fest: "屋企做節",
@@ -275,7 +412,34 @@ const I18N = {
     dinner: "晚飯",
     doctor: "睇醫生",
     tea: "同親戚飲茶",
-    locked: "呢個晚上已定"
+    locked: "呢個晚上已定",
+    bday: "媽媽生日",
+    yearly: "每年",
+    accountsNote: "這不是登入。撳帳戶試用對方日曆同版面。Janice 偏少女心，阿啟偏 Outlook。真正產品需要識別身份；這個示範不做假登入。",
+    holidayNote: "2026 香港憲報公眾假期。只標示，不自動佔用時段。",
+    saved: "已加到你的一週",
+    limitsTitle: "這個示範會做／不會做",
+    limitsIntro: "版面大致保留。只改把握較高的項目。意思未清、或難以核實的，這個示範不會假裝已經做到。",
+    limitsInHead: "這個示範做得到",
+    limitsOutHead: "之後應該會有，但這個示範不會做——因為難以核實它是否真的在運作",
+    limitsClose: "知道了",
+    limitsInItems: [
+      "有名有姓（Janice、阿啟、媽媽、美姨、Sam）——仍然不是登入。",
+      "同一份資料、唔同版面：Janice 少女心／阿啟 Outlook。",
+      "自己的日曆可選週／月／年。",
+      "真實日子。活動可選地點、備註。新增後有確認。",
+      "標示 2026 香港憲報公眾假期（只顯示，不是假期產品）。",
+      "一個「每年」生日標記，作為重複活動提示——不是 Outlook RRULE。"
+    ],
+    limitsOutItems: [
+      "真正登入／身份核實。",
+      "Outlook 級重複活動（每月第一個星期一、例外）。",
+      "通知——例如結婚周年一個月前提醒去訂枱。預期之後主要是 iOS／Android app，再是瀏覽器／網頁，亦可配合電郵。這個網頁核實不到系統通知，所以不會做一堆設定。",
+      "自訂／情境群組（見家長、睇醫生、尚未想到的 grouping）。",
+      "相、sticker，或載入很重的公開邀請頁。",
+      "「邀請」相對 share calendar、群組直篤、以及只在自己這邊刪除。意思仍未清，不下產品結論。",
+      "獨立的 delegate 控制。權限層級已透過群組示範。"
+    ]
   }
 };
 
@@ -289,7 +453,8 @@ function seed() {
       { id: "e4", ownerId: "self", day: 4, slot: "pm", titleKey: "hike", share: "open", open: true, joined: [] },
       { id: "e5", ownerId: "self", day: 3, slot: "eve", titleKey: "dinner", share: "private", open: false, joined: [] },
       { id: "e6", ownerId: "partner", day: 0, slot: "eve", titleKey: "locked", share: "private", open: false, joined: [] },
-      { id: "e7", ownerId: "relative", day: 2, slot: "eve", titleKey: "tea", share: "extended", open: false, joined: [] }
+      { id: "e7", ownerId: "relative", day: 2, slot: "eve", titleKey: "tea", share: "extended", open: false, joined: [] },
+      { id: "e8", ownerId: "parent", date: "2026-09-12", slot: "pm", titleKey: "bday", share: "direct", yearly: true, open: false, joined: [] }
     ],
     invites: [
       { id: "i1", eventId: "e5", fromId: "self", toId: "friend", status: "pending" }
@@ -300,6 +465,8 @@ function seed() {
 
 let lang = localStorage.getItem(LANG_KEY) || "zh";
 let state = loadState();
+let calView = localStorage.getItem(VIEW_KEY) || "week";
+let monthCursor = (() => { const n = new Date(); return new Date(n.getFullYear(), n.getMonth(), 1); })();
 
 function t(k) { return I18N[lang][k]; }
 function person(id) { return PEOPLE.find(p => p.id === id); }
@@ -314,6 +481,27 @@ function loadState() {
   } catch { return seed(); }
 }
 function save() { localStorage.setItem(STATE_KEY, JSON.stringify(state)); }
+
+function fmtDay(d) {
+  if (lang === "zh") {
+    return `${d.getMonth() + 1}月${d.getDate()}日\n${t("weekdays")[(d.getDay() + 6) % 7]}`;
+  }
+  return `${t("weekdays")[(d.getDay() + 6) % 7]}\n${d.getDate()} ${d.toLocaleString("en", { month: "short" })}`;
+}
+function fmtDayOneLine(d) {
+  if (lang === "zh") return `${d.getMonth() + 1}月${d.getDate()}日（${t("weekdays")[(d.getDay() + 6) % 7]}）`;
+  return `${t("weekdays")[(d.getDay() + 6) % 7]} ${d.getDate()} ${d.toLocaleString("en", { month: "short" })}`;
+}
+function fmtDayShort(d) {
+  if (lang === "zh") return `${d.getDate()}/${d.getMonth() + 1}`;
+  return String(d.getDate());
+}
+function weekRangeLabel() {
+  const a = WEEK[0], b = WEEK[6];
+  if (lang === "zh") return `${a.getFullYear()}年${a.getMonth() + 1}月${a.getDate()}日–${b.getMonth() + 1}月${b.getDate()}日`;
+  const opt = { day: "numeric", month: "short" };
+  return `${a.toLocaleDateString("en-GB", opt)} – ${b.toLocaleDateString("en-GB", opt)} ${b.getFullYear()}`;
+}
 
 function stronger(a, b) {
   const rank = { none: 0, busy: 1, open: 2, details: 3, full: 4 };
@@ -345,8 +533,32 @@ function eventAccess(viewerId, ev) {
   return cal === "details" ? "details" : cal === "busy" ? "busy" : "none";
 }
 
-function eventAt(ownerId, day, slot) {
-  return state.events.find(e => e.ownerId === ownerId && e.day === day && e.slot === slot);
+function ymd(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+}
+function holidayOf(d) {
+  const h = HOLIDAYS[ymd(d)];
+  return h ? (lang === "zh" ? h.zh : h.en) : "";
+}
+function sameDay(a, b) {
+  return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate();
+}
+function weekIndexOf(d) {
+  return WEEK.findIndex(w => sameDay(w, d));
+}
+function eventsOnDate(ownerId, d) {
+  const key = ymd(d);
+  const md = key.slice(5);
+  const wi = weekIndexOf(d);
+  const out = [];
+  if (wi >= 0) out.push(...state.events.filter(e => e.ownerId === ownerId && e.day === wi && !e.date));
+  out.push(...state.events.filter(e => e.ownerId === ownerId && e.date && (e.date === key || (e.yearly && e.date.slice(5) === md))));
+  return out;
+}
+
+function eventsAt(ownerId, day, slot) {
+  const d = WEEK[day];
+  return eventsOnDate(ownerId, d).filter(e => !e.slot || e.slot === slot);
 }
 
 function applySkin() {
@@ -356,6 +568,7 @@ function applySkin() {
   r.setProperty("--ink", s.ink);
   r.setProperty("--accent", s.accent);
   r.setProperty("--accent-2", s.accent2);
+  document.body.dataset.layout = person(state.viewer).layout || "warm";
 }
 
 function renderAccounts() {
@@ -370,37 +583,129 @@ function renderAccounts() {
 
 function titleOf(ev) { return ev.titleKey ? t(ev.titleKey) : (ev.title || ""); }
 
+function extrasHtml(ev, access) {
+  if (!ev || access === "none" || access === "busy") return "";
+  const bits = [];
+  if (ev.yearly) bits.push(t("yearly"));
+  if (ev.place) bits.push(ev.place);
+  if (ev.remark && (access === "full" || access === "details")) bits.push(ev.remark);
+  return bits.length ? `<span class="sub">${bits.join(" · ")}</span>` : "";
+}
+
 function cellHtml(ev, access) {
   if (!ev || access === "none") return `<span class="muted">${t("free")}</span>`;
   if (access === "busy") return `<b>${t("busy")}</b>`;
-  if (access === "open") return `<b>${t("open")}</b>${titleOf(ev)}`;
-  return `<b>${titleOf(ev)}</b>`;
+  if (access === "open") return `<b>${t("open")}</b>${titleOf(ev)}${extrasHtml(ev, access)}`;
+  return `<b>${titleOf(ev)}</b>${extrasHtml(ev, access)}`;
+}
+
+function stackHtml(list, accessFn) {
+  if (!list.length) return `<span class="muted">${t("free")}</span>`;
+  return list.map(ev => cellHtml(ev, accessFn(ev))).join("");
+}
+
+function toast(msg) {
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.classList.add("show");
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => el.classList.remove("show"), 2600);
 }
 
 function renderMyWeek() {
-  const host = document.getElementById("myWeek");
-  let html = `<div></div>` + DAYS.map(d => `<div class="dh">${t("days")[d]}</div>`).join("");
+  const host = document.getElementById("myCal");
+  let html = `<div></div>` + DAYS.map(d => {
+    const hol = holidayOf(WEEK[d]);
+    return `<div class="dh">${fmtDay(WEEK[d])}${hol ? `\n<span class="hol">${hol}</span>` : ""}</div>`;
+  }).join("");
   for (const slot of SLOTS) {
     html += `<div class="lab">${t(slot)}</div>`;
     for (const day of DAYS) {
-      const ev = eventAt(state.viewer, day, slot);
-      const cls = !ev ? "free" : ev.open ? "open" : "detail";
-      html += `<div class="slot ${cls}">${cellHtml(ev, ev ? "full" : "none")}</div>`;
+      const list = eventsAt(state.viewer, day, slot);
+      const cls = !list.length ? "free" : list.some(ev => ev.open) ? "open" : "detail";
+      html += `<div class="slot ${cls}">${stackHtml(list, () => "full")}</div>`;
     }
   }
+  host.className = "week";
   host.innerHTML = html;
+}
+
+function monthLabel(d) {
+  return lang === "zh" ? `${d.getFullYear()}年${d.getMonth()+1}月` : d.toLocaleString("en", { month: "long", year: "numeric" });
+}
+
+function renderMonth() {
+  const y = monthCursor.getFullYear(), m = monthCursor.getMonth();
+  const first = new Date(y, m, 1);
+  const startPad = (first.getDay() + 6) % 7;
+  const daysIn = new Date(y, m + 1, 0).getDate();
+  let html = DAYS.map(d => `<div class="dh">${t("weekdays")[d]}</div>`).join("");
+  for (let i = 0; i < startPad; i++) html += `<div class="mcell out"></div>`;
+  for (let day = 1; day <= daysIn; day++) {
+    const d = new Date(y, m, day);
+    const hol = holidayOf(d);
+    const list = eventsOnDate(state.viewer, d);
+    html += `<div class="mcell${hol ? " detail" : ""}"><span class="n">${day}</span>${hol ? `<span class="hol">${hol}</span>` : ""}${list.map(ev => `<b>${titleOf(ev)}</b>${extrasHtml(ev,"full")}`).join("")}</div>`;
+  }
+  const host = document.getElementById("myCal");
+  host.className = "month";
+  host.innerHTML = html;
+}
+
+function renderYear() {
+  const y = monthCursor.getFullYear();
+  const host = document.getElementById("myCal");
+  host.className = "year";
+  host.innerHTML = Array.from({ length: 12 }, (_, mi) => {
+    const first = new Date(y, mi, 1);
+    const pad = (first.getDay() + 6) % 7;
+    const n = new Date(y, mi + 1, 0).getDate();
+    let cells = "";
+    for (let i = 0; i < pad; i++) cells += `<i></i>`;
+    for (let day = 1; day <= n; day++) {
+      const d = new Date(y, mi, day);
+      const hol = holidayOf(d);
+      const has = eventsOnDate(state.viewer, d).length;
+      cells += `<i class="${hol ? "hol" : has ? "ev" : ""}">${day}</i>`;
+    }
+    const label = lang === "zh" ? `${mi+1}月` : first.toLocaleString("en", { month: "short" });
+    return `<div class="ymini" data-m="${mi}"><strong>${label}</strong><div class="g">${cells}</div></div>`;
+  }).join("");
+  host.querySelectorAll(".ymini").forEach(el => el.onclick = () => {
+    monthCursor = new Date(y, Number(el.dataset.m), 1);
+    calView = "month";
+    localStorage.setItem(VIEW_KEY, calView);
+    render();
+  });
+}
+
+function renderMyCal() {
+  const bar = document.getElementById("viewBar");
+  bar.innerHTML = ["week","month","year"].map(v =>
+    `<button class="btn ${calView===v?"on":""}" data-v="${v}" type="button">${t("view"+v[0].toUpperCase()+v.slice(1))}</button>`
+  ).join("");
+  bar.querySelectorAll("button").forEach(b => b.onclick = () => {
+    calView = b.dataset.v;
+    localStorage.setItem(VIEW_KEY, calView);
+    render();
+  });
+  if (calView === "month") renderMonth();
+  else if (calView === "year") renderYear();
+  else renderMyWeek();
 }
 
 function renderOthers() {
   const host = document.getElementById("others");
+  const head = DAYS.map(d => `<div class="c head">${fmtDayShort(WEEK[d])}</div>`).join("");
   host.innerHTML = PEOPLE.filter(p => p.id !== state.viewer).map(p => {
     const access = calendarAccess(state.viewer, p.id);
     const cells = SLOTS.map(slot => DAYS.map(day => {
-      const ev = eventAt(p.id, day, slot);
-      const acc = ev ? eventAccess(state.viewer, ev) : "none";
-      const label = cellHtml(ev, acc);
-      const kind = !ev || acc === "none" ? "" : acc === "busy" ? "busy" : acc === "open" ? "open" : "detail";
-      return `<div class="c ${kind}">${acc === "none" ? "" : label}</div>`;
+      const list = eventsAt(p.id, day, slot);
+      const accs = list.map(ev => eventAccess(state.viewer, ev));
+      const visible = list.filter((_, i) => accs[i] !== "none");
+      const label = visible.length ? visible.map((ev, i) => cellHtml(ev, eventAccess(state.viewer, ev))).join("") : "";
+      const kind = !visible.length ? "" : accs.includes("busy") && visible.every(ev => eventAccess(state.viewer, ev) === "busy") ? "busy" : accs.includes("open") ? "open" : "detail";
+      return `<div class="c ${kind}">${label}</div>`;
     }).join("")).join("");
     const canSub = p.subscribeCap !== "none";
     const subbed = state.subs.some(s => s.fromId === state.viewer && s.toId === p.id);
@@ -409,7 +714,7 @@ function renderOthers() {
       : "";
     return `<div class="person-row">
       <div class="meta"><strong>${nameOf(p.id)}</strong><span class="muted">${t(access === "none" ? "hidden" : access)}${subBtn}</span></div>
-      <div class="tiny">${cells}</div>
+      <div class="tiny">${head}${cells}</div>
     </div>`;
   }).join("");
   host.querySelectorAll("[data-sub]").forEach(b => b.onclick = () => {
@@ -469,7 +774,7 @@ function renderSide() {
 
 function fillDialog() {
   const form = document.getElementById("eventForm");
-  form.day.innerHTML = DAYS.map(d => `<option value="${d}">${t("days")[d]}</option>`).join("");
+  form.day.innerHTML = DAYS.map(d => `<option value="${d}">${fmtDayOneLine(WEEK[d])}</option>`).join("");
   form.slot.innerHTML = `<option value="pm">${t("pm")}</option><option value="eve">${t("eve")}</option>`;
   form.share.innerHTML = ["private","partner","direct","extended","open"].map(k => {
     const label = { private: t("sharePrivate"), partner: t("sharePartner"), direct: t("shareDirect"),
@@ -480,33 +785,52 @@ function fillDialog() {
     PEOPLE.filter(p => p.id !== state.viewer).map(p => `<option value="${p.id}">${nameOf(p.id)}</option>`).join("");
 }
 
+function fillLimits() {
+  document.getElementById("limitsTitle").textContent = t("limitsTitle");
+  document.getElementById("limitsIntro").textContent = t("limitsIntro");
+  document.getElementById("limitsInHead").textContent = t("limitsInHead");
+  document.getElementById("limitsOutHead").textContent = t("limitsOutHead");
+  document.getElementById("limitsClose").textContent = t("limitsClose");
+  document.getElementById("limitsIn").innerHTML = t("limitsInItems").map(x => `<li>${x}</li>`).join("");
+  document.getElementById("limitsOut").innerHTML = t("limitsOutItems").map(x => `<li>${x}</li>`).join("");
+}
+
 function renderChrome() {
   document.documentElement.lang = lang === "zh" ? "zh-HK" : "en";
+  document.getElementById("buildStamp").textContent = BUILD;
   document.getElementById("tagline").textContent = t("tagline");
   document.getElementById("langBtn").textContent = t("lang");
+  document.getElementById("limitsBtn").textContent = t("limitsBtn");
   document.getElementById("newBtn").textContent = t("newEvent");
   document.getElementById("resetBtn").textContent = t("reset");
-  document.getElementById("myWeekTitle").textContent = `${t("myWeek")} · ${t("viewing")} ${nameOf(state.viewer)}`;
+  document.getElementById("myWeekTitle").textContent = calView === "year"
+    ? `${t("myWeek")} · ${monthCursor.getFullYear()} · ${t("viewing")} ${nameOf(state.viewer)}`
+    : calView === "month"
+      ? `${t("myWeek")} · ${monthLabel(monthCursor)} · ${t("viewing")} ${nameOf(state.viewer)}`
+      : `${t("myWeek")} · ${weekRangeLabel()} · ${t("viewing")} ${nameOf(state.viewer)}`;
   document.getElementById("othersTitle").textContent = t("others");
   document.getElementById("sideTitle").textContent = t("side");
   document.getElementById("myHint").textContent = t("myHint");
+  document.getElementById("accountsNote").textContent = t("accountsNote");
   document.getElementById("dlgTitle").textContent = t("dlg");
   document.getElementById("lblTitle").textContent = t("title");
   document.getElementById("lblDay").textContent = t("day");
   document.getElementById("lblSlot").textContent = t("slot");
-  document.getElementById("lblShare").textContent = t("sharePrivate").split(" ")[0] ? t("title") && "分享 / Share" : "";
+  document.getElementById("lblPlace").textContent = t("place");
+  document.getElementById("lblRemark").textContent = t("remark");
   document.getElementById("lblShare").textContent = lang === "zh" ? "分享" : "Share";
   document.getElementById("lblInvite").textContent = t("invite");
   document.getElementById("saveBtn").textContent = t("save");
   document.getElementById("cancelBtn").textContent = t("cancel");
   fillDialog();
+  fillLimits();
 }
 
 function render() {
   applySkin();
   renderChrome();
   renderAccounts();
-  renderMyWeek();
+  renderMyCal();
   renderOthers();
   renderSide();
 }
@@ -517,20 +841,35 @@ document.getElementById("langBtn").onclick = () => {
   render();
 };
 document.getElementById("resetBtn").onclick = () => {
-  state = seed();
-  save();
-  render();
+  // ponytail: drop this sketch's storage + Cache API + SW, then bypass HTTP cache
+  Object.keys(localStorage).filter(k => k.startsWith("ldar-poc")).forEach(k => localStorage.removeItem(k));
+  const go = () => {
+    const url = new URL(location.href);
+    url.searchParams.set("v", BUILD.replace(/\s+/g, "_"));
+    url.searchParams.set("r", String(Date.now()));
+    location.replace(url.href);
+  };
+  const jobs = [];
+  if (window.caches) jobs.push(caches.keys().then(keys => Promise.all(keys.filter(k => /ldar/i.test(k)).map(k => caches.delete(k)))));
+  if (navigator.serviceWorker) jobs.push(navigator.serviceWorker.getRegistrations().then(rs => Promise.all(rs.map(r => r.unregister()))));
+  Promise.all(jobs).catch(() => {}).then(go);
 };
 document.getElementById("newBtn").onclick = () => document.getElementById("dlg").showModal();
 document.getElementById("cancelBtn").onclick = () => document.getElementById("dlg").close();
+document.getElementById("limitsBtn").onclick = () => document.getElementById("limitsDlg").showModal();
+document.getElementById("limitsClose").onclick = () => document.getElementById("limitsDlg").close();
 document.getElementById("eventForm").onsubmit = (e) => {
   e.preventDefault();
   const f = e.target;
   const id = "e" + Date.now();
   const share = f.share.value;
+  const day = Number(f.day.value);
+  const slot = f.slot.value;
+  const title = f.title.value.trim();
   state.events.push({
-    id, ownerId: state.viewer, day: Number(f.day.value), slot: f.slot.value,
-    titleKey: null, title: f.title.value, share, open: share === "open", joined: []
+    id, ownerId: state.viewer, day, slot,
+    titleKey: null, title, place: f.place.value.trim(), remark: f.remark.value.trim(),
+    share, open: share === "open", joined: []
   });
   if (f.invite.value) {
     state.invites.push({ id: "i"+Date.now(), eventId: id, fromId: state.viewer, toId: f.invite.value, status: "pending" });
@@ -538,9 +877,14 @@ document.getElementById("eventForm").onsubmit = (e) => {
   f.reset();
   document.getElementById("dlg").close();
   save(); render();
+  toast(`${t("saved")} · ${title} · ${fmtDayOneLine(WEEK[day])} ${t(slot)}`);
 };
 
 render();
+if (!localStorage.getItem(LIMITS_KEY)) {
+  document.getElementById("limitsDlg").showModal();
+  localStorage.setItem(LIMITS_KEY, "1");
+}
 </script>
 </body>
 </html>
