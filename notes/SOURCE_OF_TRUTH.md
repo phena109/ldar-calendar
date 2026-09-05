@@ -198,9 +198,10 @@ These are **gaps**, not decisions:
 | Metaphor | Don’t freeze “email vs phone+calendar”; observe later. |
 | POC bar | Interaction sketch > MVP. **Locally workable** static page; cookie/localStorage; clear/reset → **same seed**. Janice 2026-09-03 asked for **日子 / dates** instead of abstract demo “days” — week now uses real calendar dates. UI should feel appetising, not wireframe-ugly. |
 | Groups (new) | **Permission profiles** with default access behaviour. POC set: **Partner**, **Direct family**, **Extended family**. |
+| Partner / layers (2026-09-06) | Collaborator try in the sketch, **not Janice freeze**: a group is also a **shared calendar layer**. Drop into Partner → already on both people’s **own** week; no extra invite inside the group. Layer off or × = hide on my side only (WhatsApp-like). Invite remains for people **outside** that group. Same graph as “2-person group calendar” vs “toggle the Partner layer.” Still unresolved vs earlier 要 meeting invite. |
 | i18n | **English + Hong Kong Traditional Chinese** (zh-HK). Prefer **most common HK terms**; not TW-specific, not Mainland simplified/phrasing; generic Traditional only if no HK-friendly term. |
 
-**Last updated:** 2026-09-03 (full reassess: named people, dual layout, week/month/year, HK 2026 holidays in sketch).
+**Last updated:** 2026-09-06 (collaborator try: group = shared calendar layer; still not Janice freeze).
 
 ---
 
@@ -228,8 +229,8 @@ These are **gaps**, not decisions:
 
 | Treat as | Item |
 |----------|------|
-| Changed in demo | Real calendar dates; add confirmation + stacked slots; location/remark; account pills not login; **示範說明** popup; named people (Janice / 阿啟 / 媽媽 / 美姨 / Sam); cute vs Outlook layout on switch; week/month/year; HK 2026 gazetted general holidays marked (display only); yearly birthday tag as recurrence *hint* |
-| Popup / not in this demo | Real login; Outlook RRULE (first Monday, exceptions); notifications; custom groups; photos/stickers/heavy invitation; 邀請 vs share-calendar vs delete-my-side; standalone delegate control |
+| Changed in demo | Real calendar dates; add confirmation + stacked slots; location/remark; account pills not login; **示範說明** popup; named people (Janice / 阿啟 / 媽媽 / 美姨 / Sam); cute vs Outlook layout on switch; week/month/year; HK 2026 gazetted general holidays marked (display only); yearly birthday tag as recurrence *hint*; **2026-09-06 collaborator try:** group share lands on members’ own week as a layer; invite only for outsiders; layer off / × = hide on my side only — not a freeze of 「邀請」 |
+| Popup / not in this demo | Real login; Outlook RRULE (first Monday, exceptions); notifications; custom groups; photos/stickers/heavy invitation; standalone delegate control |
 | Backlog, no conclusion | B6 邀請 / 直篤 / del-from-my-side vs earlier meeting-invite. Custom groups. App notification design (keep settings simple if ever built). Holiday *product* (region, school vs statutory, blocking time) — sketch only marks 2026 HK gazetted general holidays. |
 
 Do not fold collaborator packaging (app > browser > page + email) into Janice canon until she says it.
