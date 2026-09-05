@@ -54,6 +54,29 @@
       display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px;
     }
     .accounts-note { font-size: 12px; color: var(--muted); margin: 0 0 16px; line-height: 1.4; }
+    .layers {
+      display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+      margin: 0 0 12px;
+    }
+    .layers .lab-inline { font-size: 12px; color: var(--muted); margin-right: 2px; }
+    .layer {
+      display: flex; align-items: center; gap: 6px;
+      padding: 5px 10px; border-radius: 999px;
+      border: 1px solid var(--line); background: var(--card);
+      font-size: 12px;
+    }
+    .layer .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+    .layer.off { opacity: .4; }
+    .layer.on { outline: 2px solid color-mix(in srgb, var(--accent) 50%, transparent); }
+    .chip {
+      font-size: 9px; letter-spacing: .03em; padding: 1px 5px; border-radius: 999px;
+      border: 1px solid var(--line); display: inline-block; margin-top: 2px; color: var(--muted);
+    }
+    .hide-x {
+      float: right; border: 0; background: transparent; color: var(--muted);
+      font-size: 11px; padding: 0 2px; line-height: 1; cursor: pointer;
+    }
+    #shareHint { font-size: 12px; color: var(--muted); line-height: 1.45; margin: -2px 0 2px; }
     .pill {
       display: flex; align-items: center; gap: 8px;
       padding: 7px 12px 7px 7px; border-radius: 999px;
@@ -196,6 +219,7 @@
           <h2 id="myWeekTitle"></h2>
           <div class="tools view-bar" id="viewBar"></div>
         </div>
+        <div class="layers" id="layers"></div>
         <div id="myCal"></div>
         <p class="hint" id="myHint"></p>
       </section>
@@ -219,7 +243,8 @@
       <label><span id="lblPlace"></span><input name="place" maxlength="40" /></label>
       <label><span id="lblRemark"></span><input name="remark" maxlength="80" /></label>
       <label><span id="lblShare"></span><select name="share"></select></label>
-      <label><span id="lblInvite"></span><select name="invite"></select></label>
+      <p id="shareHint"></p>
+      <label id="inviteRow"><span id="lblInvite"></span><select name="invite"></select></label>
       <div class="tools">
         <button class="btn primary" type="submit" id="saveBtn"></button>
         <button class="btn" type="button" id="cancelBtn"></button>
@@ -244,10 +269,10 @@
   <div id="toast" role="status"></div>
 
 <script>
-const BUILD = "2026-09-03 09:32 AEST";
+const BUILD = "2026-09-06 00:22 AEST";
 const LANG_KEY = "ldar-poc-lang";
-const STATE_KEY = "ldar-poc-state-v4";
-const LIMITS_KEY = "ldar-poc-seen-limits-v5";
+const STATE_KEY = "ldar-poc-state-v5";
+const LIMITS_KEY = "ldar-poc-seen-limits-v6";
 const VIEW_KEY = "ldar-poc-view";
 const DAYS = [0,1,2,3,4,5,6];
 const SLOTS = ["pm", "eve"];
@@ -306,15 +331,15 @@ const GROUPS = [
 
 const I18N = {
   en: {
-    tagline: "A sketch of one person, one calendar — sharing by invite, group default, or subscription. Nothing here is a product decision.",
+    tagline: "Try: drop an activity into Partner — it lands on both weeks. No extra invite. Layers can be turned off. Not a product freeze.",
     lang: "繁體中文（香港）",
     newEvent: "New activity",
     reset: "Clear cache & reset",
     limitsBtn: "Demo notes",
     myWeek: "My calendar",
     viewWeek: "Week", viewMonth: "Month", viewYear: "Year",
-    others: "What I can see",
-    side: "Invites, groups, subscriptions",
+    others: "What I can see of others",
+    side: "Groups as layers · extra invites",
     viewing: "Viewing as",
     pm: "Afternoon", eve: "Evening",
     weekdays: ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"],
@@ -324,19 +349,29 @@ const I18N = {
     subscribe: "Subscribe", unsubscribe: "Stop",
     cap: "Others may subscribe up to",
     none: "Off",
-    groups: "Groups",
+    groups: "Group calendars / layers",
     partner: "Partner", direct: "Direct family", extended: "Extended family",
-    gHint: "Group default applies to the other person’s week. Dropping an activity into a group lets members see its details.",
-    sharePrivate: "Keep private",
-    sharePartner: "Share to Partner group",
-    shareDirect: "Share to Direct family",
-    shareExtended: "Share to Extended family",
+    mineLayer: "Mine",
+    layers: "On my week",
+    gHint: "Partner is a 2-person shared layer. Drop into the group → it is already on the other person’s calendar. Turning a layer off hides it on your side only. Invite is only for someone not already in that group.",
+    sharePrivate: "Keep on my calendar only",
+    sharePartner: "Put on Partner layer",
+    shareDirect: "Put on Direct family layer",
+    shareExtended: "Put on Extended family layer",
     shareOpen: "Open — anyone may join",
+    shareHintPrivate: "Only you see this. Invite is optional (e.g. Sam).",
+    shareHintPartner: "Janice and Kai both get this on their week. No invite between partners.",
+    shareHintDirect: "Janice, Kai, and Mum get this on their week. No invite inside the group.",
+    shareHintExtended: "Janice, Mum, and Yee get this on their week. No invite inside the group.",
+    shareHintOpen: "Not a group layer. Others may join if they see it.",
     inviteNone: "No extra invite",
+    inviteOut: "Invite someone outside this group",
+    hideMine: "Hide on my side only",
+    savedGroup: "On the group layer — members see it on their calendar",
     dlg: "Add activity",
     title: "Title", day: "Date", slot: "Time", place: "Location (optional)", remark: "Remark (optional)",
     save: "Save", cancel: "Close",
-    myHint: "Same data, different layout per person. This week uses real dates. Hong Kong 2026 general holidays are marked. Dashed empty cells are free.",
+    myHint: "Try as Janice: New activity → Partner layer → switch to Kai. It is already on his week, no pending invite. Turn Partner off = hide on his side only. Same data, different layout. Real dates. HK 2026 holidays marked.",
     noInvites: "No pending invites.",
     movie: "Movie together",
     fest: "Family festival",
@@ -361,7 +396,8 @@ const I18N = {
       "Week / month / year on your calendar.",
       "Real dates. Optional location and remark. Add confirms on your week.",
       "Hong Kong 2026 gazetted general holidays marked (not a holiday product; display only).",
-      "A yearly birthday tag as a recurrence hint — not Outlook RRULE."
+      "A yearly birthday tag as a recurrence hint — not Outlook RRULE.",
+      "Try: Partner / family as a shared layer (2-person group calendar). Drop in → members see it on their own week. No extra invite inside the group. Layer off or × = hide on my side only. Invite stays for people outside the group. Collaborator reading — not frozen."
     ],
     limitsOutItems: [
       "Real login / identity.",
@@ -369,20 +405,20 @@ const I18N = {
       "Notifications — for example a one-month reminder to book an anniversary dinner. Likely later as iOS/Android apps, then browser/page, and email. This page cannot verify OS/app alerts, so we are not adding a settings maze.",
       "Custom / situational groups (parent–teacher, doctor visits, groupings not thought of yet).",
       "Photos, stickers, or a heavy public invitation page.",
-      "What 「邀請」 should mean versus share-calendar, group push, and delete-from-my-side-only. Still unclear — no product conclusion.",
+      "A final meaning of 「邀請」. This sketch tries one reading (group layer vs extra invite). Still not a product conclusion.",
       "Delegate access as its own control. Access tiers already exist via groups."
     ]
   },
   zh: {
-    tagline: "試用草圖：一個人一個日曆。以邀請、群組預設權限或訂閱來分享。此處並非產品決定。",
+    tagline: "試用：活動放到伴侶層，兩人的週都會見到，不用另外邀請。層可以關掉。不是產品定案。",
     lang: "English",
     newEvent: "新增活動",
     reset: "清除快取並重設",
     limitsBtn: "示範說明",
     myWeek: "我的日曆",
     viewWeek: "週", viewMonth: "月", viewYear: "年",
-    others: "我可見的情況",
-    side: "邀請、群組、訂閱",
+    others: "我見到其他人的情況",
+    side: "群組＝日曆層 · 額外邀請",
     viewing: "目前帳戶",
     pm: "下午", eve: "晚上",
     weekdays: ["星期一","星期二","星期三","星期四","星期五","星期六","星期日"],
@@ -392,19 +428,29 @@ const I18N = {
     subscribe: "訂閱", unsubscribe: "取消訂閱",
     cap: "容許其他人訂閱至",
     none: "不開放",
-    groups: "群組",
+    groups: "群組日曆／層",
     partner: "伴侶", direct: "直系家人", extended: "親戚",
-    gHint: "群組預設決定你見到對方一週的程度。將活動放到群組後，成員便可見到該活動詳情。",
-    sharePrivate: "保持私人",
-    sharePartner: "分享到伴侶群組",
-    shareDirect: "分享到直系家人群組",
-    shareExtended: "分享到親戚群組",
+    mineLayer: "自己",
+    layers: "顯示在我的週",
+    gHint: "伴侶群組像兩人共用的一層日曆：放到這層，對方週上直接見到，不用邀請。關掉該層＝只在自己這邊隱藏。邀請只用於不在該群組的人。",
+    sharePrivate: "只放在自己日曆",
+    sharePartner: "放到伴侶層",
+    shareDirect: "放到直系家人層",
+    shareExtended: "放到親戚層",
     shareOpen: "公開——其他人可以加入",
+    shareHintPrivate: "只有你見到。可以另外邀請（例如 Sam）。",
+    shareHintPartner: "Janice 同阿啟的週都會見到。伴侶之間不用邀請。",
+    shareHintDirect: "Janice、阿啟、媽媽的週都會見到。群組內不用邀請。",
+    shareHintExtended: "Janice、媽媽、美姨的週都會見到。群組內不用邀請。",
+    shareHintOpen: "不是群組層。其他人見到就可以加入。",
     inviteNone: "不另外邀請",
+    inviteOut: "邀請群組以外的人",
+    hideMine: "只在自己這邊隱藏",
+    savedGroup: "已放到群組層——成員的日曆會見到",
     dlg: "新增活動",
     title: "名稱", day: "日子", slot: "時段", place: "地點（可選）", remark: "備註（可選）",
     save: "儲存", cancel: "關閉",
-    myHint: "同一份資料，不同人不同版面。這一週用真實日子。已標示 2026 香港憲報公眾假期。虛線空格即有空。",
+    myHint: "用 Janice 試：新增活動→伴侶層→再撳阿啟。活動已在他的週，沒有待回覆邀請。關掉伴侶層＝只在他這邊隱藏。同一份資料、不同版面。真實日子。已標示 2026 香港假期。",
     noInvites: "現時沒有待回覆邀請。",
     movie: "一齊睇戲",
     fest: "屋企做節",
@@ -429,7 +475,8 @@ const I18N = {
       "自己的日曆可選週／月／年。",
       "真實日子。活動可選地點、備註。新增後有確認。",
       "標示 2026 香港憲報公眾假期（只顯示，不是假期產品）。",
-      "一個「每年」生日標記，作為重複活動提示——不是 Outlook RRULE。"
+      "一個「每年」生日標記，作為重複活動提示——不是 Outlook RRULE。",
+      "試用：伴侶／家人作為共用層（兩人的群組日曆）。放到該層→成員自己的週直接見到。群組內不用另外邀請。關掉層或撳 ×＝只在自己這邊隱藏。邀請仍用於群組以外的人。這是合作者的讀法，不是定案。"
     ],
     limitsOutItems: [
       "真正登入／身份核實。",
@@ -437,7 +484,7 @@ const I18N = {
       "通知——例如結婚周年一個月前提醒去訂枱。預期之後主要是 iOS／Android app，再是瀏覽器／網頁，亦可配合電郵。這個網頁核實不到系統通知，所以不會做一堆設定。",
       "自訂／情境群組（見家長、睇醫生、尚未想到的 grouping）。",
       "相、sticker，或載入很重的公開邀請頁。",
-      "「邀請」相對 share calendar、群組直篤、以及只在自己這邊刪除。意思仍未清，不下產品結論。",
+      "「邀請」的最終意思。這個示範試一種讀法（群組層 vs 額外邀請），仍不是產品結論。",
       "獨立的 delegate 控制。權限層級已透過群組示範。"
     ]
   }
@@ -446,6 +493,8 @@ const I18N = {
 function seed() {
   return {
     viewer: "self",
+    layersOff: {},
+    hiddenBy: {},
     events: [
       { id: "e1", ownerId: "self", day: 1, slot: "eve", titleKey: "movie", share: "partner", open: false, joined: ["partner"] },
       { id: "e2", ownerId: "parent", day: 3, slot: "pm", titleKey: "doctor", share: "direct", open: false, joined: [] },
@@ -509,6 +558,55 @@ function stronger(a, b) {
 }
 function inGroup(gid, pid) { return GROUPS.find(g => g.id === gid).members.includes(pid); }
 
+const LAYER_COLOR = { mine: "#8a7a6c", partner: "#2f5d8a", direct: "#4a7c59", extended: "#7a5a8e", open: "#a67c2d" };
+
+function layerOf(ev) {
+  if (ev.share === "open" || ev.open) return "open";
+  if (ev.share === "private") return "mine";
+  return ev.share;
+}
+function layerLabel(id) {
+  if (id === "mine") return t("mineLayer");
+  return t(id);
+}
+function layersOffFor(pid) {
+  if (!state.layersOff) state.layersOff = {};
+  if (!state.layersOff[pid]) state.layersOff[pid] = [];
+  return state.layersOff[pid];
+}
+function hiddenFor(pid) {
+  if (!state.hiddenBy) state.hiddenBy = {};
+  if (!state.hiddenBy[pid]) state.hiddenBy[pid] = [];
+  return state.hiddenBy[pid];
+}
+function isLayerOn(pid, layerId) {
+  return !layersOffFor(pid).includes(layerId);
+}
+function eventFallsOn(ev, d) {
+  const key = ymd(d);
+  const md = key.slice(5);
+  const wi = weekIndexOf(d);
+  if (ev.date) return ev.date === key || (ev.yearly && ev.date.slice(5) === md);
+  return wi >= 0 && ev.day === wi;
+}
+function onMyCalendar(viewerId, ev) {
+  if (hiddenFor(viewerId).includes(ev.id)) return false;
+  const layer = layerOf(ev);
+  if (ev.ownerId === viewerId) {
+    const lid = (layer === "open") ? "mine" : layer;
+    return isLayerOn(viewerId, GROUPS.some(g => g.id === lid) ? lid : "mine");
+  }
+  if (ev.share !== "private" && ev.share !== "open") {
+    if (inGroup(ev.share, viewerId) && inGroup(ev.share, ev.ownerId)) {
+      return isLayerOn(viewerId, ev.share);
+    }
+  }
+  const inv = state.invites.find(i => i.eventId === ev.id && i.toId === viewerId && i.status === "accepted");
+  if (inv) return true;
+  if (ev.open && ev.joined.includes(viewerId)) return true;
+  return false;
+}
+
 function calendarAccess(viewerId, ownerId) {
   if (viewerId === ownerId) return "full";
   let best = "none";
@@ -561,6 +659,13 @@ function eventsAt(ownerId, day, slot) {
   return eventsOnDate(ownerId, d).filter(e => !e.slot || e.slot === slot);
 }
 
+function eventsOnMyDate(viewerId, d) {
+  return state.events.filter(ev => onMyCalendar(viewerId, ev) && eventFallsOn(ev, d));
+}
+function eventsAtMy(viewerId, day, slot) {
+  return eventsOnMyDate(viewerId, WEEK[day]).filter(e => !e.slot || e.slot === slot);
+}
+
 function applySkin() {
   const s = person(state.viewer).skin;
   const r = document.documentElement.style;
@@ -592,16 +697,36 @@ function extrasHtml(ev, access) {
   return bits.length ? `<span class="sub">${bits.join(" · ")}</span>` : "";
 }
 
-function cellHtml(ev, access) {
-  if (!ev || access === "none") return `<span class="muted">${t("free")}</span>`;
-  if (access === "busy") return `<b>${t("busy")}</b>`;
-  if (access === "open") return `<b>${t("open")}</b>${titleOf(ev)}${extrasHtml(ev, access)}`;
-  return `<b>${titleOf(ev)}</b>${extrasHtml(ev, access)}`;
+function chipHtml(ev) {
+  const id = layerOf(ev);
+  if (id === "mine") return "";
+  return `<span class="chip">${layerLabel(id)}</span>`;
 }
 
-function stackHtml(list, accessFn) {
+function cellHtml(ev, access, opts = {}) {
+  if (!ev || access === "none") return `<span class="muted">${t("free")}</span>`;
+  const hide = opts.hide && ev.ownerId !== state.viewer
+    ? `<button class="hide-x" type="button" data-hide="${ev.id}" title="${t("hideMine")}">×</button>`
+    : "";
+  if (access === "busy") return `${hide}<b>${t("busy")}</b>`;
+  if (access === "open") return `${hide}<b>${t("open")}</b>${titleOf(ev)}${extrasHtml(ev, access)}${chipHtml(ev)}`;
+  return `${hide}<b>${titleOf(ev)}</b>${extrasHtml(ev, access)}${chipHtml(ev)}`;
+}
+
+function stackHtml(list, accessFn, opts = {}) {
   if (!list.length) return `<span class="muted">${t("free")}</span>`;
-  return list.map(ev => cellHtml(ev, accessFn(ev))).join("");
+  return list.map(ev => cellHtml(ev, accessFn(ev), opts)).join("");
+}
+
+function bindHide(host) {
+  host.querySelectorAll("[data-hide]").forEach(b => b.onclick = (ev) => {
+    ev.stopPropagation();
+    const id = b.dataset.hide;
+    const list = hiddenFor(state.viewer);
+    if (!list.includes(id)) list.push(id);
+    save(); render();
+    toast(t("hideMine"));
+  });
 }
 
 function toast(msg) {
@@ -610,6 +735,25 @@ function toast(msg) {
   el.classList.add("show");
   clearTimeout(toast._t);
   toast._t = setTimeout(() => el.classList.remove("show"), 2600);
+}
+
+function renderLayers() {
+  const host = document.getElementById("layers");
+  const mine = ["mine", ...GROUPS.filter(g => g.members.includes(state.viewer)).map(g => g.id)];
+  host.innerHTML = `<span class="lab-inline">${t("layers")}</span>` + mine.map(id => {
+    const on = isLayerOn(state.viewer, id);
+    return `<button class="layer ${on ? "on" : "off"}" data-layer="${id}" type="button">
+      <span class="dot" style="background:${LAYER_COLOR[id] || "#888"}"></span>${layerLabel(id)}
+    </button>`;
+  }).join("");
+  host.querySelectorAll("[data-layer]").forEach(b => b.onclick = () => {
+    const id = b.dataset.layer;
+    const off = layersOffFor(state.viewer);
+    const i = off.indexOf(id);
+    if (i >= 0) off.splice(i, 1);
+    else off.push(id);
+    save(); render();
+  });
 }
 
 function renderMyWeek() {
@@ -621,13 +765,14 @@ function renderMyWeek() {
   for (const slot of SLOTS) {
     html += `<div class="lab">${t(slot)}</div>`;
     for (const day of DAYS) {
-      const list = eventsAt(state.viewer, day, slot);
+      const list = eventsAtMy(state.viewer, day, slot);
       const cls = !list.length ? "free" : list.some(ev => ev.open) ? "open" : "detail";
-      html += `<div class="slot ${cls}">${stackHtml(list, () => "full")}</div>`;
+      html += `<div class="slot ${cls}">${stackHtml(list, () => "full", { hide: true })}</div>`;
     }
   }
   host.className = "week";
   host.innerHTML = html;
+  bindHide(host);
 }
 
 function monthLabel(d) {
@@ -644,8 +789,8 @@ function renderMonth() {
   for (let day = 1; day <= daysIn; day++) {
     const d = new Date(y, m, day);
     const hol = holidayOf(d);
-    const list = eventsOnDate(state.viewer, d);
-    html += `<div class="mcell${hol ? " detail" : ""}"><span class="n">${day}</span>${hol ? `<span class="hol">${hol}</span>` : ""}${list.map(ev => `<b>${titleOf(ev)}</b>${extrasHtml(ev,"full")}`).join("")}</div>`;
+    const list = eventsOnMyDate(state.viewer, d);
+    html += `<div class="mcell${hol ? " detail" : ""}"><span class="n">${day}</span>${hol ? `<span class="hol">${hol}</span>` : ""}${list.map(ev => `<b>${titleOf(ev)}</b>${chipHtml(ev)}${extrasHtml(ev,"full")}`).join("")}</div>`;
   }
   const host = document.getElementById("myCal");
   host.className = "month";
@@ -665,7 +810,7 @@ function renderYear() {
     for (let day = 1; day <= n; day++) {
       const d = new Date(y, mi, day);
       const hol = holidayOf(d);
-      const has = eventsOnDate(state.viewer, d).length;
+      const has = eventsOnMyDate(state.viewer, d).length;
       cells += `<i class="${hol ? "hol" : has ? "ev" : ""}">${day}</i>`;
     }
     const label = lang === "zh" ? `${mi+1}月` : first.toLocaleString("en", { month: "short" });
@@ -781,8 +926,24 @@ function fillDialog() {
       extended: t("shareExtended"), open: t("shareOpen") }[k];
     return `<option value="${k}">${label}</option>`;
   }).join("");
+  form.share.onchange = updateShareInviteUI;
+  updateShareInviteUI();
+}
+
+function updateShareInviteUI() {
+  const form = document.getElementById("eventForm");
+  const share = form.share.value;
+  const hint = document.getElementById("shareHint");
+  const row = document.getElementById("inviteRow");
+  const key = { private: "shareHintPrivate", partner: "shareHintPartner", direct: "shareHintDirect",
+    extended: "shareHintExtended", open: "shareHintOpen" }[share];
+  hint.textContent = key ? t(key) : "";
+  const g = GROUPS.find(x => x.id === share);
+  const outsiders = PEOPLE.filter(p => p.id !== state.viewer && (!g || !g.members.includes(p.id)));
+  document.getElementById("lblInvite").textContent = g ? t("inviteOut") : t("invite");
   form.invite.innerHTML = `<option value="">${t("inviteNone")}</option>` +
-    PEOPLE.filter(p => p.id !== state.viewer).map(p => `<option value="${p.id}">${nameOf(p.id)}</option>`).join("");
+    outsiders.map(p => `<option value="${p.id}">${nameOf(p.id)}</option>`).join("");
+  row.style.display = share === "open" ? "none" : "";
 }
 
 function fillLimits() {
@@ -830,6 +991,7 @@ function render() {
   applySkin();
   renderChrome();
   renderAccounts();
+  renderLayers();
   renderMyCal();
   renderOthers();
   renderSide();
@@ -877,7 +1039,8 @@ document.getElementById("eventForm").onsubmit = (e) => {
   f.reset();
   document.getElementById("dlg").close();
   save(); render();
-  toast(`${t("saved")} · ${title} · ${fmtDayOneLine(WEEK[day])} ${t(slot)}`);
+  const groupShare = GROUPS.some(g => g.id === share);
+  toast(`${groupShare ? t("savedGroup") : t("saved")} · ${title} · ${fmtDayOneLine(WEEK[day])} ${t(slot)}`);
 };
 
 render();
